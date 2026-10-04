@@ -1,0 +1,15 @@
+@use "../variables" as *;
+
+.btn {
+  width: fit-content;
+  font-size: 25px;
+  padding: 10px 30px;
+  border-radius: 10px;
+  background-color: $yellow;
+  color: $green-dark;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}

@@ -1,1 +1,23 @@
 @use "../variables" as *;
+
+section.home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  @include bgcover;
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  h1 {
+    font-size: 100px;
+    font-weight: 900;
+    line-height: 120%;
+  }
+}

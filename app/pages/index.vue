@@ -2,5 +2,10 @@
 </script>
 
 <template>
-  <h1>hola</h1>
+  <section class="home message" style="background-image: url(/img/bg-login.png);">
+    <div class="container">
+      <h1>BIENVENIDO</h1>
+      <a href="" class="btn large">Ingresar<i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+  </section>
 </template>

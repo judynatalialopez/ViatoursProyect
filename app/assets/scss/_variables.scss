@@ -4,7 +4,34 @@ $white: #FFF;
 
 $yellow: #dbac31;
 $green: #038e41;
-$green-dark: #248d74;
+$green-dark: #06252d;
 // Tipografia
 $poppins: 'Roboto', sans-serif;
 $faPro: 'Font Awesome 6 Pro';
+
+
+// MIXIN
+@mixin bgcover {
+  // background-image: url("../img/image.jpg");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+}
+
+@mixin before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+@mixin imgCover {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
