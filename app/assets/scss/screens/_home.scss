@@ -6,6 +6,8 @@ section.home {
   justify-content: center;
   min-height: 100vh;
   @include bgcover;
+  transition: all 400ms ease;
+
 
   .container {
     display: flex;
@@ -13,6 +15,7 @@ section.home {
     justify-content: center;
     flex-direction: column;
     gap: 30px;
+    transition: all 400ms ease;
   }
 
   h1 {
@@ -20,5 +23,15 @@ section.home {
     font-weight: 900;
     line-height: 120%;
     animation: aparecerTitulo 0.8s ease-out both;
+    transition: all 400ms ease;
+    text-align: center;
+
+    @media screen and (max-width: 1023px) {
+      font-size: 60px;
+    }
+
+    @media screen and (max-width: 767px) {
+      font-size: 30px;
+    }
   }
 }
