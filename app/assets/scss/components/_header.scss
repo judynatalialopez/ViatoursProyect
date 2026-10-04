@@ -1,18 +1,15 @@
 @use "../variables" as *;
 
 header {
-  padding: 12px 0;
-  border-bottom: 1px solid #5454547a;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgb(26 26 26 / 12%);
+  backdrop-filter: blur(2px);
+  padding: 20px 0;
 
-  .content {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-  }
-
-  span {
-    font-size: 16px;
-    font-weight: 500;
+  .logo {
+    max-width: 200px;
   }
 }
