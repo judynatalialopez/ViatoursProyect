@@ -3,7 +3,7 @@
 
 <template>
   <Header />
-  <section class="home message" style="background-image: url(/img/bg-login.png);">
+  <section class="home" style="background-image: url(/img/bg-login.png);">
     <div class="container">
       <h1>BIENVENIDO</h1>
       <div class="decoration">
