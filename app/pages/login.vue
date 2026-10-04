@@ -155,7 +155,7 @@
 
       <form action="">
         <div class="title">
-          <i class="fa-light fa-user-plus"></i>
+          <i class="fa-light fa-id-card"></i>
           <div>
             <h3>Tu recorrido</h3>
             <h4>Hoy, ¿quién tendra el gusto llevarte?</h4>
