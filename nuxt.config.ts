@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'es' },
+      title: 'Viatours',
 
       meta: [
         {
@@ -17,6 +18,11 @@ export default defineNuxtConfig({
       ],
 
       link: [
+        {
+          rel: 'icon',
+          type: 'image/png',
+          href: '/img/favicon.png',
+        },
         {
           rel: 'stylesheet',
           href: '/css/fontawesome.css',
