@@ -6,5 +6,5 @@ VIATOURS se desarrolla como una plataforma web orientada a la planificación y g
 ## **cuando termine, inicia el proyecto:**
 ### npm run dev
 
-## ** para instalar las dependencias después de clonar el repositorio:**
+## ** para instalar las dependencias después de clonar el repositorio: **
 ### npm install
