@@ -8,3 +8,12 @@ VIATOURS se desarrolla como una plataforma web orientada a la planificación y g
 
 ## **instalar las dependencias:**
 - npm install
+
+## **package.json, agrega dev:host dentro de "scripts"**
+- "scripts": {
+  "dev": "nuxt dev",
+  "dev:host": "nuxt dev --host --qr"
+}
+
+## **Comando para ejecucion (para lograr la ejecucion en el movil)**
+- npm run dev:host
