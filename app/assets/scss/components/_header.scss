@@ -1,0 +1,18 @@
+@use "../variables" as *;
+
+header {
+  padding: 12px 0;
+  border-bottom: 1px solid #5454547a;
+
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  span {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}

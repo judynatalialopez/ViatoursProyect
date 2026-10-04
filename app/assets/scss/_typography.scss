@@ -1,0 +1,12 @@
+// Poppins autoalojada. Solo los cuatro pesos que usa el diseno y solo
+// woff2: en la sala del cine cada kilobyte es tiempo de carga sobre una
+// conexion mala, y woff2 lo soporta cualquier navegador que llegue aqui.
+@each $name, $weight in ('Regular': 400, 'Medium': 500, 'SemiBold': 600, 'Bold': 700) {
+  @font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-#{$name}.woff2') format('woff2');
+    font-weight: $weight;
+    font-style: normal;
+    font-display: swap;
+  }
+}
