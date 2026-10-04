@@ -7,7 +7,14 @@ section.home {
   min-height: 100vh;
   @include bgcover;
   transition: all 400ms ease;
+  position: relative;
 
+  &::before {
+    @include before;
+    background-color: $black;
+    opacity: 70%;
+    z-index: 1;
+  }
 
   .container {
     display: flex;
@@ -16,6 +23,7 @@ section.home {
     flex-direction: column;
     gap: 30px;
     transition: all 400ms ease;
+    z-index: 2;
   }
 
   h1 {
