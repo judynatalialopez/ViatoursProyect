@@ -1,5 +1,6 @@
 // Paleta
 $black: #1A1A1A;
+$gray: #4f4f4f;
 $white: #FFF;
 
 $yellow: #dbac31;
@@ -8,6 +9,10 @@ $green-dark: #06252d;
 // Tipografia
 $poppins: 'Roboto', sans-serif;
 $faPro: 'Font Awesome 6 Pro';
+
+i {
+  font-family: $faPro;
+}
 
 // MIXIN
 @mixin bgcover {

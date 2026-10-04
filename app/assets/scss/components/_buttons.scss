@@ -1,7 +1,7 @@
 @use "../variables" as *;
 
 .btn {
-  width: fit-content;
+  width: 100%;
   font-size: 25px;
   padding: 10px 30px;
   border-radius: 10px;
@@ -13,9 +13,14 @@
   justify-content: center;
   gap: 15px;
   transition: all 400ms ease;
+  cursor: pointer;
 
   @media screen and (max-width: 1023px) {
     font-size: 18px;
+  }
+
+  &.large {
+    width: fit-content;
   }
 
   &:hover {
@@ -29,12 +34,31 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
+  text-align: center;
+
+  &.green {
+    .line {
+      background: $green;
+    }
+  }
+
+  &.yellow {
+    .line {
+      background: $yellow;
+    }
+  }
 
   .line {
-    height: 4px;
+    height: 8px;
     width: 100%;
     max-width: 100px;
-    background: $green;
+  }
+
+  h3 {
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: 5.8px;
+    text-transform: uppercase;
   }
 
   i {

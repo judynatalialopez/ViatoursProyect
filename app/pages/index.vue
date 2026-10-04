@@ -3,15 +3,14 @@
 
 <template>
   <Header />
-  <section class="home" style="background-image: url(/img/bg-login.png);">
+  <section class="home message" style="background-image: url(/img/bg-login.png);">
     <div class="container">
       <h1>BIENVENIDO</h1>
-      <div class="decoration">
-        <div class="line"></div>
+      <Decoration>
         <i class="fa-solid fa-location-dot"></i>
-        <div class="line"></div>
-      </div>
-      <a href="login" class="btn large">Ingresar<i class="fa-solid fa-arrow-right"></i></a>
+      </Decoration>
+
+      <Button href="login" class="large">Entrar<i class="fa-solid fa-arrow-right"></i></Button>
     </div>
   </section>
 </template>
