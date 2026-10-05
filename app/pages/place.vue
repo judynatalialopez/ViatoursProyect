@@ -1,43 +1,11 @@
 <script setup>
 import { computed, ref } from 'vue'
-
-const lugares = [
-  {
-    id: 1,
-    titulo: 'Zipaquirá',
-    imagen: '/img/places/city/city-01-zipaquira.jpg',
-  },
-  {
-    id: 2,
-    titulo: 'Bogotá',
-    imagen: '/img/places/city/city-02-bogota.png',
-  },
-  {
-    id: 3,
-    titulo: 'Villa de Leyva',
-    imagen: '/img/places/city/city-03-villa.jpeg',
-  },
-  {
-    id: 4,
-    titulo: 'Boyacá',
-    imagen: '/img/places/city/city-04-boyaca.jpeg',
-  },
-  {
-    id: 5,
-    titulo: 'Lugar 1',
-    imagen: '',
-  },
-  {
-    id: 6,
-    titulo: 'Lugar 2',
-    imagen: '',
-  },
-]
+import { places } from '../data/places-obj'
 
 const cantidadVisible = ref(4)
 
 const lugaresVisibles = computed(() =>
-  lugares.slice(0, cantidadVisible.value)
+  places.slice(0, cantidadVisible.value)
 )
 
 function verMas() {
@@ -73,17 +41,17 @@ function verMenos() {
       <div class="container-grid">
         <Card-page v-for="lugar in lugaresVisibles" :key="lugar.id">
           <template #img>
-            <img v-if="lugar.imagen" :src="lugar.imagen" :alt="lugar.titulo" />
+            <img v-if="lugar.image" :src="lugar.image" :alt="lugar.title" />
           </template>
 
           <template #title>
-            {{ lugar.titulo }}
+            {{ lugar.title }}
           </template>
         </Card-page>
       </div>
 
-      <div v-if="lugares.length > 4" class="content-see-more">
-        <Button class="large" v-if="cantidadVisible < lugares.length" @click="verMas">
+      <div v-if="places.length > 4" class="content-see-more">
+        <Button class="large" v-if="cantidadVisible < places.length" @click="verMas">
           Ver más
         </Button>
 

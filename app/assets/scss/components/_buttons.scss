@@ -68,8 +68,9 @@
     max-width: 100px;
   }
 
-  h3 {
-    font-size: 21px;
+  h3,
+  li {
+    font-size: 18px;
     font-weight: 400;
     letter-spacing: 5.8px;
     text-transform: uppercase;
@@ -78,5 +79,25 @@
   i {
     font-size: 32px;
     color: $yellow;
+  }
+
+  ul {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    position: relative;
+
+    li:first-child {
+      list-style: none;
+    }
+
+    li {
+      list-style: disc;
+
+      &::marker {
+        color: $yellow;
+      }
+    }
   }
 }
