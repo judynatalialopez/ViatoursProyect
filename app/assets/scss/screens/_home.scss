@@ -234,6 +234,13 @@ section.home {
   }
 }
 
+.prueba-form {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+}
+
 @media screen and (max-width: 1023px) {
 
   section.home.login h1,

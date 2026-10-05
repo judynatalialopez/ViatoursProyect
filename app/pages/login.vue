@@ -1,10 +1,23 @@
 <script setup>
+import { ref } from 'vue'
+
+const formularioActual = ref(0)
+
+function siguienteForm() {
+  formularioActual.value = (formularioActual.value + 1) % 4
+}
 </script>
 
 <template>
   <Header />
 
-  <section class="home login start none" style="background-image: url(/img/bg-login.png);">
+  <div class="prueba-form">
+    <Button @click="siguienteForm">
+      Siguiente form
+    </Button>
+  </div>
+
+  <section v-show="formularioActual === 0" class="home login start" style="background-image: url(/img/bg-login.png);">
     <div class="container">
       <h1>INICIAR SESIÓN</h1>
       <Decoration variante="yellow">
@@ -48,7 +61,8 @@
     </div>
   </section>
 
-  <section class="home login password none" style="background-image: url(/img/bg-login.png);">
+  <section v-show="formularioActual === 1" class="home login password"
+    style="background-image: url(/img/bg-login.png);">
     <div class="container">
       <h2>Recuperar acceso</h2>
       <Decoration variante="yellow">
@@ -83,7 +97,7 @@
     </div>
   </section>
 
-  <section class="home login create none" style="background-image: url(/img/bg-login.png);">
+  <section v-show="formularioActual === 2" class="home login create" style="background-image: url(/img/bg-login.png);">
     <div class="container">
       <h2>Regristrese</h2>
       <Decoration variante="yellow">
@@ -146,7 +160,8 @@
     </div>
   </section>
 
-  <section class="home login assign-driver" style="background-image: url(/img/bg-login.png);">
+  <section v-show="formularioActual === 3" class="home login assign-driver"
+    style="background-image: url(/img/bg-login.png);">
     <div class="container">
       <h2>CONDUCTOR</h2>
       <Decoration variante="yellow">
