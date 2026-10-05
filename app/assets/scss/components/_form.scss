@@ -64,6 +64,12 @@ form {
     background: transparent;
     color: $white;
 
+    &:focus {
+      outline: none;
+      border: 1px solid $yellow;
+      box-shadow: inset 0px 0px 7px 5px rgb(219 172 49 / 11%);
+    }
+
     &::placeholder {
       color: $gray;
     }
