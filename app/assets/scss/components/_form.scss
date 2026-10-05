@@ -116,3 +116,24 @@ form {
     line-height: 120%;
   }
 }
+
+.search {
+  padding: 0;
+  border: initial;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+
+  >div {
+    width: 100%;
+    display: flex;
+    gap: 20px;
+  }
+
+  .error {
+    color: red;
+    width: 100%;
+    max-width: initial;
+    display: none;
+  }
+}
