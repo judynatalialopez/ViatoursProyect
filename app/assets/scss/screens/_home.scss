@@ -193,13 +193,41 @@ section.home {
     padding: 120px 0;
 
     .container-card-route {
-      max-width: 830px;
+      max-width: 900px;
       gap: 50px;
       padding: 0;
       background: transparent;
       backdrop-filter: initial;
       border: initial;
+      position: relative;
       margin-top: 70px;
+
+      max-height: 386px;
+      overflow: auto;
+      padding-right: 14px;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .content-btns {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .img-line {
+      position: absolute;
+      width: 276px;
+    }
+
+    .row {
+      align-items: flex-start;
     }
 
     .card-route {
@@ -213,13 +241,25 @@ section.home {
       align-items: flex-start;
       gap: 15px;
       justify-content: flex-start;
+      flex-direction: column;
+      position: relative;
 
       &.left {
         margin-left: auto;
+
+        .img-line {
+          right: 106%;
+          top: 74%;
+        }
       }
 
       &.right {
         margin-right: auto;
+
+        .img-line {
+          left: 106%;
+          top: 74%;
+        }
       }
 
       h3 {
@@ -250,10 +290,13 @@ section.home {
       }
 
       .bottom {
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 16px;
+        padding-top: 12px;
+        border-top: 1px solid $gray;
       }
 
       .route-check {

@@ -25,6 +25,25 @@
     }
   }
 
+  &.black {
+    background-color: $black;
+    color: $green;
+
+    i {
+      color: $green !important;
+    }
+
+    &:hover {
+      background-color: $green;
+      color: $black;
+    }
+  }
+
+  &.small {
+    width: fit-content;
+    font-size: 18px;
+  }
+
   i {
     color: $green-dark !important;
   }

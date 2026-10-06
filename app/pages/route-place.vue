@@ -38,28 +38,33 @@ function formatoPrecio(valor) {
 
       <form class="container-card-route" @submit.prevent>
         <div v-for="(route, index) in routes" :key="route.id" class="card-route"
-          :class="index % 2 === 0 ? 'left' : 'right'">
-          <div class="circle">
-            <i class="fa-regular fa-camera"></i>
-          </div>
-
-          <div class="text">
-            <h3>{{ route.title_card }}</h3>
-            <p>{{ route.description }}</p>
-
-            <div class="bottom">
-              <strong>
-                <i class="fa-solid fa-coins"></i>
-                <span>Valor: </span>
-                {{ formatoPrecio(route.price) }}
-              </strong>
-
-              <label class="route-check">
-                <input type="checkbox" v-model="seleccionadas" :value="route.id"
-                  :aria-label="`Agregar ${route.title_card}`" />
-                <span class="route-check__circle" aria-hidden="true"></span>
-              </label>
+          :class="index % 2 === 0 ? 'right' : 'left'">
+          <div class="row">
+            <div class="circle">
+              <i class="fa-regular fa-camera"></i>
             </div>
+            <div class="text">
+              <h3>{{ route.title_card }}</h3>
+              <p>{{ route.description }}</p>
+            </div>
+          </div>
+          <div class="bottom">
+            <strong>
+              <i class="fa-solid fa-coins"></i>
+              <span>Valor: </span>
+              {{ formatoPrecio(route.price) }}
+            </strong>
+
+            <label class="route-check">
+              <input type="checkbox" v-model="seleccionadas" :value="route.id"
+                :aria-label="`Agregar ${route.title_card}`" />
+              <span class="route-check__circle" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div class="img-line" v-if="index < routes.length - 1">
+            <img :src="index % 2 === 0
+              ? '/img/line-right.svg'
+              : '/img/line-left.svg'" alt="" />
           </div>
         </div>
       </form>
@@ -69,6 +74,11 @@ function formatoPrecio(valor) {
         <p><i class="fa-solid fa-hand-point-up"></i>Selecciona un destino click en el circulo de cada punto para conocer
           su información y ver el total de la
           tarifa. También puedes explorar más opciones.</p>
+      </div>
+
+      <div class="content-btns">
+        <Button class="small black">Ver restaurante</Button>
+        <Button class="small">Continuar</Button>
       </div>
 
       <div class="modal-img" v-for="route in routes" :key="route.id">
