@@ -77,8 +77,8 @@ function formatoPrecio(valor) {
       </div>
 
       <div class="content-btns">
-        <Button class="small black">Ver restaurante</Button>
-        <Button class="small">Continuar</Button>
+        <Button href="restaurant" class="small black">Ver restaurante</Button>
+        <Button href="" class="small">Continuar</Button>
       </div>
 
       <div class="modal-img" v-for="route in routes" :key="route.id">
