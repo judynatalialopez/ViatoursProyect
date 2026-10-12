@@ -158,7 +158,7 @@ function formatoPrecio(valor) {
           Ver recorridos
         </Button>
 
-        <Button href="" class="small">
+        <Button href="billing" class="small">
           Continuar
         </Button>
 

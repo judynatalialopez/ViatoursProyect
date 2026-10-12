@@ -131,7 +131,7 @@ function cerrarModal() {
           Ver restaurante
         </Button>
 
-        <Button href="" class="small">
+        <Button href="billing" class="small">
           Continuar
         </Button>
 
