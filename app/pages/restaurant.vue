@@ -15,19 +15,23 @@ const placeId = computed(() => {
 })
 
 const place = computed(() =>
-  places.find(lugar => lugar.id === placeId.value)
+  places.find((lugar) => lugar.id === placeId.value)
 )
 
 const restaurants = computed(() => place.value?.restaurants ?? [])
 
+const restaurantesCentro = computed(() =>
+  restaurants.value.slice(0, 3)
+)
+
 const restauranteActivo = computed(() =>
   restaurants.value.find(
-    restaurante => restaurante.id === restauranteActivoId.value
+    (restaurante) => restaurante.id === restauranteActivoId.value
   ) ?? restaurants.value[0] ?? null
 )
 
 const restaurantesSeleccionados = computed(() =>
-  restaurants.value.filter(restaurante =>
+  restaurants.value.filter((restaurante) =>
     seleccionadas.value.includes(restaurante.id)
   )
 )
@@ -76,7 +80,7 @@ function formatoPrecio(valor) {
         </ul>
       </Decoration>
 
-      <form @submit.prevent class="form-restaurant">
+      <form class="form-restaurant" @submit.prevent>
         <div class="col-left">
           <div v-for="restaurante in restaurants" :key="restaurante.id" class="card-restaurant"
             :class="{ active: restauranteActivo?.id === restaurante.id }" @click="activarRestaurante(restaurante)">
@@ -113,24 +117,25 @@ function formatoPrecio(valor) {
         </div>
 
         <div class="col-center">
-          <template v-for="(restaurante, index) in restaurants" :key="restaurante.id">
+          <template v-for="(restaurante, index) in restaurantesCentro" :key="restaurante.id">
             <button type="button" class="circle" :class="{ active: restauranteActivo?.id === restaurante.id }"
               :aria-label="`Ver ${restaurante.title_card}`" :aria-pressed="restauranteActivo?.id === restaurante.id"
               aria-controls="restaurant-detail" @click="activarRestaurante(restaurante)">
               <i class="fa-solid fa-utensils"></i>
             </button>
 
-            <div v-if="index < restaurants.length - 1" class="line" :class="index % 2 === 0 ? 'left' : 'right'">
+            <div v-if="index < restaurantesCentro.length - 1" class="line" :class="index % 2 === 0 ? 'left' : 'right'">
               <img src="/img/line-curve.png" alt="" />
             </div>
           </template>
         </div>
 
         <div id="restaurant-detail" class="col-right" aria-live="polite">
-          <div v-if="restauranteActivo" :key="restauranteActivo.id">
+          <div v-if="restauranteActivo" :key="restauranteActivo.id" class="container-txt">
             <div class="img">
               <img :src="restauranteActivo.image_card" :alt="restauranteActivo.title_card" />
             </div>
+
             <p>{{ restauranteActivo.description }}</p>
           </div>
         </div>

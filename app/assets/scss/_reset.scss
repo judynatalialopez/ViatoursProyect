@@ -144,7 +144,7 @@ body {
 // Barras de scroll de la página y de todos los contenedores
 * {
 	scrollbar-width: thin;
-	scrollbar-color: #027f38 transparent;
+	scrollbar-color: #01451e transparent;
 
 	&::-webkit-scrollbar {
 		width: 8px;
@@ -160,7 +160,7 @@ body {
 	}
 
 	&::-webkit-scrollbar-thumb {
-		background: #027f38;
+		background: #01451e;
 		border: none;
 		border-radius: 20px;
 		box-shadow: none;
