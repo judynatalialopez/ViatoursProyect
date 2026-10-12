@@ -776,6 +776,15 @@ section.home {
     margin-top: 20px;
     flex-wrap: wrap;
 
+    &.three {
+      max-width: 400px;
+      margin: 20px auto 0 auto;
+
+      a.btn.small.wd-100 {
+        width: 100%;
+      }
+    }
+
     @media screen and (max-width: 1023px) {
       .btn {
         width: 100%;
