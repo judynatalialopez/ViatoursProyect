@@ -82,7 +82,6 @@ function cerrarModal() {
             <button type="button" class="circle" :aria-label="`Ver información de ${route.title_card}`"
               @click="abrirModal(route)">
               <i class="fa-regular fa-camera"></i>
-
               <p class="text-cricle">Ver más</p>
             </button>
 
@@ -116,7 +115,7 @@ function cerrarModal() {
         </div>
       </form>
 
-      <p v-if="!routes.length">
+      <p v-if="!routes.length" class="warning">
         Este lugar todavía no tiene rutas disponibles.
       </p>
 

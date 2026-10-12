@@ -49,6 +49,12 @@ export const places = [
         description: 'Una opción para almorzar y descansar durante tu recorrido.',
         price: 45000,
         image_card: '/img/places/restaurants/zipaquira/img-02.jpg',
+      }, {
+        id: 3,
+        title_card: 'Restaurante 3',
+        description: 'Una opción para almorzar y descansar durante tu recorrido.',
+        price: 45000,
+        image_card: '/img/places/restaurants/zipaquira/img-02.jpg',
       },
     ],
   },

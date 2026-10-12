@@ -4,6 +4,10 @@ defineProps({
     type: String,
     default: '/route-place',
   },
+  restaurantesHref: {
+    type: String,
+    default: '/restaurant',
+  },
 })
 </script>
 
@@ -22,7 +26,7 @@ defineProps({
         <p>Busca el destino para iniciar el recorrido ahora</p>
 
         <div class="content-btns">
-          <Button href="/restaurant" class="border-green">
+          <Button :href="restaurantesHref" class="border-green">
             <i class="fa-light fa-utensils"></i>
             Restaurantes
           </Button>

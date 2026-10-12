@@ -65,7 +65,7 @@ function verMenos() {
 
       <div class="container-grid">
         <Card-page v-for="lugar in lugaresVisibles" :key="lugar.id"
-          :recorridos-href="`/route-place?placeId=${lugar.id}`">
+          :recorridos-href="`/route-place?placeId=${lugar.id}`" :restaurantes-href="`/restaurant?placeId=${lugar.id}`">
           <template #img>
             <img v-if="lugar.image" :src="lugar.image" :alt="lugar.title" />
           </template>
