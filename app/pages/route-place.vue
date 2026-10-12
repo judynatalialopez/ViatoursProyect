@@ -19,6 +19,16 @@ function formatoPrecio(valor) {
     maximumFractionDigits: 0,
   })
 }
+
+const rutaModal = ref(null)
+
+function abrirModal(route) {
+  rutaModal.value = route
+}
+
+function cerrarModal() {
+  rutaModal.value = null
+}
 </script>
 
 <template>
@@ -40,9 +50,10 @@ function formatoPrecio(valor) {
         <div v-for="(route, index) in routes" :key="route.id" class="card-route"
           :class="index % 2 === 0 ? 'right' : 'left'">
           <div class="row">
-            <div class="circle">
+            <button type="button" class="circle" :aria-label="`Ver información de ${route.title_card}`"
+              @click="abrirModal(route)">
               <i class="fa-regular fa-camera"></i>
-            </div>
+            </button>
             <div class="text">
               <h3>{{ route.title_card }}</h3>
               <p>{{ route.description }}</p>
@@ -81,9 +92,24 @@ function formatoPrecio(valor) {
         <Button href="" class="small">Continuar</Button>
       </div>
 
-      <div class="modal-img" v-for="route in routes" :key="route.id">
-        <img :src="route.image_card" :alt="route.title" />
-      </div>
+      <Teleport to="body">
+        <div v-if="rutaModal" class="modal-overlay" @click.self="cerrarModal" @keydown.esc="cerrarModal">
+          <div class="modal-route" role="dialog" aria-modal="true" aria-labelledby="modal-route-title">
+            <button type="button" class="modal-close" aria-label="Cerrar modal" autofocus @click="cerrarModal">
+              ×
+            </button>
+            <div class="img">
+              <img class="modal-route__image" :src="rutaModal.image_card" :alt="rutaModal.title_card" />
+            </div>
+            <div class="modal-route__content">
+              <h2 id="modal-route-title">
+                {{ rutaModal.title_card }}
+              </h2>
+              <p>{{ rutaModal.description }}</p>
+            </div>
+          </div>
+        </div>
+      </Teleport>
     </div>
   </section>
 </template>

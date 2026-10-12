@@ -139,3 +139,53 @@ body {
 	margin: 0 auto;
 	position: relative;
 }
+
+
+// Barras de scroll de la página y de todos los contenedores
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #027f38 transparent;
+
+	&::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+		background: transparent;
+	}
+
+	&::-webkit-scrollbar-track,
+	&::-webkit-scrollbar-track-piece {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: #027f38;
+		border: none;
+		border-radius: 20px;
+		box-shadow: none;
+	}
+
+	&::-webkit-scrollbar-thumb:hover,
+	&::-webkit-scrollbar-thumb:active {
+		background: #dbac31;
+	}
+
+	&::-webkit-scrollbar-corner {
+		background: transparent;
+	}
+
+	&::-webkit-scrollbar-button {
+		display: none;
+		width: 0;
+		height: 0;
+		background: transparent;
+	}
+}
+
+@supports selector(::-webkit-scrollbar) {
+	* {
+		scrollbar-width: auto;
+		scrollbar-color: auto;
+	}
+}
