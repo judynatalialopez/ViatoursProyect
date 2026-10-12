@@ -2,9 +2,10 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { places } from '../data/places-obj'
+import { usePlaceSelection } from '../composables/use-place-selection'
+import { navigateTo } from '#app'
 
 const paginaActual = useRoute()
-const seleccionadas = ref([])
 const restauranteActivoId = ref(null)
 
 const placeId = computed(() => {
@@ -18,7 +19,9 @@ const place = computed(() =>
   places.find((lugar) => lugar.id === placeId.value)
 )
 
-const restaurants = computed(() => place.value?.restaurants ?? [])
+const restaurants = computed(() =>
+  place.value?.restaurants ?? []
+)
 
 const restaurantesCentro = computed(() =>
   restaurants.value.slice(0, 3)
@@ -30,23 +33,14 @@ const restauranteActivo = computed(() =>
   ) ?? restaurants.value[0] ?? null
 )
 
-const restaurantesSeleccionados = computed(() =>
-  restaurants.value.filter((restaurante) =>
-    seleccionadas.value.includes(restaurante.id)
-  )
-)
-
-const total = computed(() =>
-  restaurantesSeleccionados.value.reduce(
-    (suma, restaurante) => suma + restaurante.price,
-    0
-  )
-)
+const {
+  selectedRestaurantIds: seleccionadas,
+  total,
+} = usePlaceSelection(placeId)
 
 watch(
   placeId,
   () => {
-    seleccionadas.value = []
     restauranteActivoId.value = restaurants.value[0]?.id ?? null
   },
   { immediate: true }
@@ -57,7 +51,7 @@ function activarRestaurante(restaurante) {
 }
 
 function formatoPrecio(valor) {
-  return valor.toLocaleString('es-CO', {
+  return Number(valor).toLocaleString('es-CO', {
     style: 'currency',
     currency: 'COP',
     maximumFractionDigits: 0,
@@ -91,7 +85,7 @@ function formatoPrecio(valor) {
             <div class="txt">
               <h3>
                 <button type="button" class="restaurant-tab" :aria-pressed="restauranteActivo?.id === restaurante.id"
-                  aria-controls="restaurant-detail" @click="activarRestaurante(restaurante)">
+                  aria-controls="restaurant-detail" @click.stop="activarRestaurante(restaurante)">
                   {{ restaurante.title_card }}
                 </button>
               </h3>
@@ -159,7 +153,8 @@ function formatoPrecio(valor) {
       </div>
 
       <div class="content-btns">
-        <Button :href="`/route-place?placeId=${place.id}`" class="small black">
+        <Button :href="`/route-place?placeId=${place.id}`" class="small black"
+          @click.prevent="navigateTo(`/route-place?placeId=${place.id}`)">
           Ver recorridos
         </Button>
 

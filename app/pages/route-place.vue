@@ -2,6 +2,8 @@
 import { computed, ref, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { places } from '../data/places-obj'
+import { usePlaceSelection } from '../composables/use-place-selection'
+import { navigateTo } from '#app'
 
 const paginaActual = useRoute()
 
@@ -13,35 +15,25 @@ const placeId = computed(() => {
 })
 
 const place = computed(() =>
-  places.find(lugar => lugar.id === placeId.value)
+  places.find((lugar) => lugar.id === placeId.value)
 )
 
 const routes = computed(() => place.value?.routes ?? [])
 
-const seleccionadas = ref([])
+const {
+  selectedRouteIds: seleccionadas,
+  total,
+} = usePlaceSelection(placeId)
+
 const rutaModal = ref(null)
 const botonCerrar = ref(null)
 
-const rutasSeleccionadas = computed(() =>
-  routes.value.filter(route =>
-    seleccionadas.value.includes(route.id)
-  )
-)
-
-const total = computed(() =>
-  rutasSeleccionadas.value.reduce(
-    (suma, route) => suma + route.price,
-    0
-  )
-)
-
 watch(placeId, () => {
-  seleccionadas.value = []
   cerrarModal()
 })
 
 function formatoPrecio(valor) {
-  return valor.toLocaleString('es-CO', {
+  return Number(valor).toLocaleString('es-CO', {
     style: 'currency',
     currency: 'COP',
     maximumFractionDigits: 0,
@@ -134,7 +126,8 @@ function cerrarModal() {
       </div>
 
       <div class="content-btns">
-        <Button :href="`/restaurant?placeId=${place.id}`" class="small black">
+        <Button :href="`/restaurant?placeId=${place.id}`" class="small black"
+          @click.prevent="navigateTo(`/restaurant?placeId=${place.id}`)">
           Ver restaurante
         </Button>
 
