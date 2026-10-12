@@ -57,6 +57,12 @@ function formatoPrecio(valor) {
     maximumFractionDigits: 0,
   })
 }
+
+function continuar() {
+  if (!place.value) return
+
+  return navigateTo(`/billing?placeId=${place.value.id}`)
+}
 </script>
 
 <template>
@@ -158,7 +164,7 @@ function formatoPrecio(valor) {
           Ver recorridos
         </Button>
 
-        <Button href="billing" class="small">
+        <Button :href="`/billing?placeId=${place.id}`" class="small" @click.prevent="continuar">
           Continuar
         </Button>
 

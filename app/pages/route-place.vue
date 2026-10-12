@@ -50,6 +50,12 @@ async function abrirModal(route) {
 function cerrarModal() {
   rutaModal.value = null
 }
+
+function continuar() {
+  if (!place.value) return
+
+  return navigateTo(`/billing?placeId=${place.value.id}`)
+}
 </script>
 
 <template>
@@ -101,8 +107,7 @@ function cerrarModal() {
           <div v-if="index < routes.length - 1" class="img-line">
             <img :src="index % 2 === 0
               ? '/img/line-right.svg'
-              : '/img/line-left.svg'
-              " alt="" />
+              : '/img/line-left.svg'" alt="" />
           </div>
         </div>
       </form>
@@ -131,7 +136,7 @@ function cerrarModal() {
           Ver restaurante
         </Button>
 
-        <Button href="billing" class="small">
+        <Button :href="`/billing?placeId=${place.id}`" class="small" @click.prevent="continuar">
           Continuar
         </Button>
 
