@@ -821,6 +821,9 @@ section.home {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            max-height: 394px;
+            padding-right: 20px;
+            overflow-y: auto;
 
             .card-itinerary {
               width: 100%;
