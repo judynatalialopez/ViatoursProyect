@@ -125,7 +125,7 @@ function cerrarModal() {
         </p>
       </div>
 
-      <div class="content-btns">
+      <div class="content-btns three">
         <Button :href="`/restaurant?placeId=${place.id}`" class="small black"
           @click.prevent="navigateTo(`/restaurant?placeId=${place.id}`)">
           Ver restaurante
@@ -133,6 +133,10 @@ function cerrarModal() {
 
         <Button href="" class="small">
           Continuar
+        </Button>
+
+        <Button href="place" class="small wd-100">
+          Volver
         </Button>
       </div>
     </div>

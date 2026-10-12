@@ -152,7 +152,7 @@ function formatoPrecio(valor) {
         </p>
       </div>
 
-      <div class="content-btns">
+      <div class="content-btns three">
         <Button :href="`/route-place?placeId=${place.id}`" class="small black"
           @click.prevent="navigateTo(`/route-place?placeId=${place.id}`)">
           Ver recorridos
@@ -160,6 +160,10 @@ function formatoPrecio(valor) {
 
         <Button href="" class="small">
           Continuar
+        </Button>
+
+        <Button href="place" class="small wd-100">
+          Volver
         </Button>
       </div>
     </div>
