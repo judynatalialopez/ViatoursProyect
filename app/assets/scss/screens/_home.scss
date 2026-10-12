@@ -106,6 +106,10 @@ section.home {
           .txt-none {
             max-height: 64px;
             overflow: initial;
+
+            @media screen and (max-width: 1023px) {
+              max-height: 163px;
+            }
           }
         }
 
