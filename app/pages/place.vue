@@ -6,7 +6,7 @@ const cantidadVisible = ref(4)
 const busqueda = ref('')
 
 function normalizar(texto) {
-  return texto
+  return String(texto ?? '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
@@ -16,7 +16,7 @@ function normalizar(texto) {
 const lugaresFiltrados = computed(() => {
   const texto = normalizar(busqueda.value)
 
-  return places.filter(lugar =>
+  return places.filter((lugar) =>
     normalizar(lugar.title).includes(texto)
   )
 })
@@ -52,7 +52,6 @@ function verMenos() {
       <form class="search" @submit.prevent>
         <div>
           <input id="search" v-model="busqueda" type="search" name="search" placeholder="Buscar destino..." />
-
           <Button class="large" aria-label="Buscar destino">
             <i class="fa-solid fa-magnifying-glass"></i>
           </Button>
