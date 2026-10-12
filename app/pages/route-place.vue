@@ -1,22 +1,44 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import { places } from '../data/places-obj'
 
-const placeId = 1
+const paginaActual = useRoute()
 
-const place = places.find(place => place.id === placeId)
-const routes = place?.routes ?? []
+const placeId = computed(() => {
+  const parametro = paginaActual.query.placeId
+  const id = Array.isArray(parametro) ? parametro[0] : parametro
+
+  return Number(id)
+})
+
+const place = computed(() =>
+  places.find(lugar => lugar.id === placeId.value)
+)
+
+const routes = computed(() => place.value?.routes ?? [])
 
 const seleccionadas = ref([])
 const rutaModal = ref(null)
+const botonCerrar = ref(null)
 
 const rutasSeleccionadas = computed(() =>
-  routes.filter(route => seleccionadas.value.includes(route.id))
+  routes.value.filter(route =>
+    seleccionadas.value.includes(route.id)
+  )
 )
 
 const total = computed(() =>
-  rutasSeleccionadas.value.reduce((suma, route) => suma + route.price, 0)
+  rutasSeleccionadas.value.reduce(
+    (suma, route) => suma + route.price,
+    0
+  )
 )
+
+watch(placeId, () => {
+  seleccionadas.value = []
+  cerrarModal()
+})
 
 function formatoPrecio(valor) {
   return valor.toLocaleString('es-CO', {
@@ -26,8 +48,11 @@ function formatoPrecio(valor) {
   })
 }
 
-function abrirModal(route) {
+async function abrirModal(route) {
   rutaModal.value = route
+
+  await nextTick()
+  botonCerrar.value?.focus()
 }
 
 function cerrarModal() {
@@ -75,6 +100,7 @@ function cerrarModal() {
             <label class="route-check">
               <input v-model="seleccionadas" type="checkbox" :value="route.id"
                 :aria-label="`Agregar ${route.title_card}`" />
+
               <span class="route-check__circle" aria-hidden="true"></span>
             </label>
           </div>
@@ -107,7 +133,7 @@ function cerrarModal() {
       </div>
 
       <div class="content-btns">
-        <Button href="restaurant" class="small black">
+        <Button :href="`/restaurant?placeId=${place.id}`" class="small black">
           Ver restaurante
         </Button>
 
@@ -123,9 +149,9 @@ function cerrarModal() {
   </p>
 
   <Teleport to="body">
-    <div v-if="rutaModal" class="modal-overlay" @click.self="cerrarModal" @keydown.esc="cerrarModal">
+    <div v-if="rutaModal" class="modal-overlay" @click.self="cerrarModal" @keydown.esc.stop.prevent="cerrarModal">
       <div class="modal-route" role="dialog" aria-modal="true" aria-labelledby="modal-route-title">
-        <button type="button" class="modal-close" aria-label="Cerrar modal" autofocus @click="cerrarModal">
+        <button ref="botonCerrar" type="button" class="modal-close" aria-label="Cerrar modal" @click="cerrarModal">
           ×
         </button>
 

@@ -1,12 +1,33 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { places } from '../data/places-obj'
 
 const cantidadVisible = ref(4)
+const busqueda = ref('')
+
+function normalizar(texto) {
+  return texto
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
+const lugaresFiltrados = computed(() => {
+  const texto = normalizar(busqueda.value)
+
+  return places.filter(lugar =>
+    normalizar(lugar.title).includes(texto)
+  )
+})
 
 const lugaresVisibles = computed(() =>
-  places.slice(0, cantidadVisible.value)
+  lugaresFiltrados.value.slice(0, cantidadVisible.value)
 )
+
+watch(busqueda, () => {
+  cantidadVisible.value = 4
+})
 
 function verMas() {
   cantidadVisible.value += 4
@@ -28,18 +49,23 @@ function verMenos() {
         <h3>Escoge tu destino el día de hoy</h3>
       </Decoration>
 
-      <form action="" class="search">
+      <form class="search" @submit.prevent>
         <div>
-          <input type="search" name="search" id="search" placeholder="Buscar destino...">
-          <Button class="large">
+          <input id="search" v-model="busqueda" type="search" name="search" placeholder="Buscar destino..." />
+
+          <Button class="large" aria-label="Buscar destino">
             <i class="fa-solid fa-magnifying-glass"></i>
           </Button>
         </div>
-        <p class="error">No se encontró el lugar</p>
+
+        <p v-if="!lugaresFiltrados.length" class="error">
+          No se encontró el lugar
+        </p>
       </form>
 
       <div class="container-grid">
-        <Card-page v-for="lugar in lugaresVisibles" :key="lugar.id">
+        <Card-page v-for="lugar in lugaresVisibles" :key="lugar.id"
+          :recorridos-href="`/route-place?placeId=${lugar.id}`">
           <template #img>
             <img v-if="lugar.image" :src="lugar.image" :alt="lugar.title" />
           </template>
@@ -50,12 +76,12 @@ function verMenos() {
         </Card-page>
       </div>
 
-      <div v-if="places.length > 4" class="content-see-more">
-        <Button class="large" v-if="cantidadVisible < places.length" @click="verMas">
+      <div v-if="lugaresFiltrados.length > 4" class="content-see-more">
+        <Button v-if="cantidadVisible < lugaresFiltrados.length" class="large" @click="verMas">
           Ver más
         </Button>
 
-        <Button class="large" v-if="cantidadVisible > 4" @click="verMenos">
+        <Button v-if="cantidadVisible > 4" class="large" @click="verMenos">
           Ver menos
         </Button>
       </div>
