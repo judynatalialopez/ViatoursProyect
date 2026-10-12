@@ -714,9 +714,13 @@ section.home {
     }
   }
 
+  &.bill {
+    padding: 120px 0;
+  }
+
   h1,
   h2 {
-    font-size: 80px;
+    font-size: 70px;
     font-weight: 900;
     line-height: 120%;
     text-transform: uppercase;
@@ -726,6 +730,7 @@ section.home {
 
     span {
       color: $yellow;
+      font-style: italic;
     }
 
     @media screen and (max-width: 1023px) {
