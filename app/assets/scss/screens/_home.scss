@@ -283,6 +283,19 @@ section.home {
         font-weight: 700;
       }
 
+      .text-cricle {
+        position: absolute;
+        width: max-content;
+        background: #037f38;
+        opacity: 0;
+        font-size: 11px;
+        padding: 3px;
+        border-radius: 4px;
+        transition: all 400ms ease;
+        right: -50px;
+        top: 0;
+      }
+
       p {
         text-align: left;
         font-weight: 300;
@@ -305,6 +318,13 @@ section.home {
         box-shadow: inset 0px 0px 7px 5px rgb(2 127 56 / 39%);
         transition: all 400ms ease;
         background: transparent;
+        position: relative;
+
+        &:hover {
+          .text-cricle {
+            opacity: 1;
+          }
+        }
 
         &:hover {
           box-shadow: inset 0px 0px 7px 5px rgb(2 127 56);
