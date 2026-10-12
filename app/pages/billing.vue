@@ -275,7 +275,7 @@ onUnmounted(() => {
 
               <p class="small">
                 <i class="fa-solid fa-grip-dots-vertical"></i>
-                Arrastra para reordenar tus paradas si deseas
+                Manten oprimido y arrastra (reordenar tus paradas)
               </p>
             </div>
 
