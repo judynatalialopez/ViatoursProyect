@@ -1,8 +1,14 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { routes } from '../data/route'
+import { places } from '../data/places-obj'
+
+const placeId = 1
+
+const place = places.find(place => place.id === placeId)
+const routes = place?.routes ?? []
 
 const seleccionadas = ref([])
+const rutaModal = ref(null)
 
 const rutasSeleccionadas = computed(() =>
   routes.filter(route => seleccionadas.value.includes(route.id))
@@ -20,8 +26,6 @@ function formatoPrecio(valor) {
   })
 }
 
-const rutaModal = ref(null)
-
 function abrirModal(route) {
   rutaModal.value = route
 }
@@ -34,9 +38,9 @@ function cerrarModal() {
 <template>
   <Header />
 
-  <section v-if="routes.length" class="home route" :style="{ backgroundImage: `url('${routes[0].image}')` }">
+  <section v-if="place" class="home route" :style="{ backgroundImage: `url('${place.image}')` }">
     <div class="container">
-      <h1>{{ routes[0].title }}</h1>
+      <h1>{{ place.title }}</h1>
 
       <Decoration variante="yellow">
         <ul>
@@ -54,11 +58,13 @@ function cerrarModal() {
               @click="abrirModal(route)">
               <i class="fa-regular fa-camera"></i>
             </button>
+
             <div class="text">
               <h3>{{ route.title_card }}</h3>
               <p>{{ route.description }}</p>
             </div>
           </div>
+
           <div class="bottom">
             <strong>
               <i class="fa-solid fa-coins"></i>
@@ -67,49 +73,74 @@ function cerrarModal() {
             </strong>
 
             <label class="route-check">
-              <input type="checkbox" v-model="seleccionadas" :value="route.id"
+              <input v-model="seleccionadas" type="checkbox" :value="route.id"
                 :aria-label="`Agregar ${route.title_card}`" />
               <span class="route-check__circle" aria-hidden="true"></span>
             </label>
           </div>
-          <div class="img-line" v-if="index < routes.length - 1">
+
+          <div v-if="index < routes.length - 1" class="img-line">
             <img :src="index % 2 === 0
               ? '/img/line-right.svg'
-              : '/img/line-left.svg'" alt="" />
+              : '/img/line-left.svg'
+              " alt="" />
           </div>
         </div>
       </form>
 
+      <p v-if="!routes.length">
+        Este lugar todavía no tiene rutas disponibles.
+      </p>
+
       <div class="total" aria-live="polite">
-        <strong><span>Total: </span>{{ formatoPrecio(total) }}</strong>
-        <p><i class="fa-solid fa-hand-point-up"></i>Selecciona un destino click en el circulo de cada punto para conocer
-          su información y ver el total de la
-          tarifa. También puedes explorar más opciones.</p>
+        <strong>
+          <span>Total: </span>
+          {{ formatoPrecio(total) }}
+        </strong>
+
+        <p>
+          <i class="fa-solid fa-hand-point-up"></i>
+          Haz clic en el círculo de la cámara para conocer cada destino.
+          Marca las opciones que quieras visitar para ver el total de la
+          tarifa. También puedes explorar más opciones.
+        </p>
       </div>
 
       <div class="content-btns">
-        <Button href="restaurant" class="small black">Ver restaurante</Button>
-        <Button href="" class="small">Continuar</Button>
-      </div>
+        <Button href="restaurant" class="small black">
+          Ver restaurante
+        </Button>
 
-      <Teleport to="body">
-        <div v-if="rutaModal" class="modal-overlay" @click.self="cerrarModal" @keydown.esc="cerrarModal">
-          <div class="modal-route" role="dialog" aria-modal="true" aria-labelledby="modal-route-title">
-            <button type="button" class="modal-close" aria-label="Cerrar modal" autofocus @click="cerrarModal">
-              ×
-            </button>
-            <div class="img">
-              <img class="modal-route__image" :src="rutaModal.image_card" :alt="rutaModal.title_card" />
-            </div>
-            <div class="modal-route__content">
-              <h2 id="modal-route-title">
-                {{ rutaModal.title_card }}
-              </h2>
-              <p>{{ rutaModal.description }}</p>
-            </div>
-          </div>
-        </div>
-      </Teleport>
+        <Button href="" class="small">
+          Continuar
+        </Button>
+      </div>
     </div>
   </section>
+
+  <p v-else class="container">
+    No se encontró el lugar seleccionado.
+  </p>
+
+  <Teleport to="body">
+    <div v-if="rutaModal" class="modal-overlay" @click.self="cerrarModal" @keydown.esc="cerrarModal">
+      <div class="modal-route" role="dialog" aria-modal="true" aria-labelledby="modal-route-title">
+        <button type="button" class="modal-close" aria-label="Cerrar modal" autofocus @click="cerrarModal">
+          ×
+        </button>
+
+        <div class="img">
+          <img class="modal-route__image" :src="rutaModal.image_card" :alt="rutaModal.title_card" />
+        </div>
+
+        <div class="modal-route__content">
+          <h2 id="modal-route-title">
+            {{ rutaModal.title_card }}
+          </h2>
+
+          <p>{{ rutaModal.description }}</p>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
