@@ -728,7 +728,6 @@ section.home {
       align-items: flex-start;
       gap: 20px;
 
-      // Estilos compartidos de las cajas
       .box {
         width: 100%;
         border-radius: 10px;
@@ -809,7 +808,6 @@ section.home {
         }
       }
 
-      // Columna izquierda
       .col-left {
         width: 60%;
         display: flex;
@@ -944,7 +942,6 @@ section.home {
             }
           }
 
-          // Tiempo del recorrido
           &.time {
             .time-options {
               display: grid;
@@ -1040,7 +1037,6 @@ section.home {
         }
       }
 
-      // Columna derecha
       .col-right {
         width: 40%;
 
@@ -1165,7 +1161,6 @@ section.home {
       }
     }
 
-    // Responsive: tablet
     @media (max-width: 1024px) {
       padding: 80px 0;
 
@@ -1224,7 +1219,6 @@ section.home {
       }
     }
 
-    // Responsive: móvil
     @media (max-width: 768px) {
       padding: 60px 0;
 
@@ -1323,7 +1317,6 @@ section.home {
       }
     }
 
-    // Responsive: móvil pequeño
     @media (max-width: 480px) {
       .container-billing {
         .box {
@@ -1431,7 +1424,6 @@ section.home {
       }
     }
 
-    // Responsive original: pantallas muy pequeñas
     @media (max-width: 380px) {
       .container-billing {
         .col-left {
