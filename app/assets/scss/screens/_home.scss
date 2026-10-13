@@ -761,6 +761,10 @@ section.home {
             }
           }
 
+          .card-itinerary {
+            pointer-events: none;
+          }
+
           .content-itinerary {
             overflow: hidden;
           }
@@ -806,6 +810,24 @@ section.home {
           }
         }
 
+        .form-time {
+          max-width: initial;
+          padding: 10px;
+          border: 1px solid $green-dark;
+
+          label,
+          p {
+            text-align: center;
+          }
+
+          .time-inputs {
+            margin: 18px 0 0 0;
+            width: 100%;
+            display: flex;
+            gap: 10px;
+          }
+        }
+
         .content-driver-place {
           width: 100%;
           display: flex;
@@ -813,6 +835,9 @@ section.home {
           align-items: flex-start;
           gap: 20px;
           padding: 0 20px;
+          padding-right: 20px;
+          overflow: auto;
+          max-height: 223px;
 
           .item {
             width: 100%;
@@ -836,11 +861,16 @@ section.home {
               width: fit-content;
               min-width: 101px;
               border-radius: 5px;
-              background: transparent;
+              background: black;
               border: 1px solid $green;
               font-weight: 600;
               color: $green;
               cursor: pointer;
+              transition: all 400ms ease;
+
+              &:hover {
+                transform: scale(0.9);
+              }
 
               &.red {
                 color: $red;
@@ -1555,13 +1585,16 @@ section.home {
 
     button.btn.small {
       flex-direction: column;
+      padding: 10px;
     }
 
     .time-item {
       flex-wrap: wrap;
+      border: 1px solid $green-dark;
 
       .time-value {
         width: 100%;
+        font-size: 20px;
       }
     }
   }
