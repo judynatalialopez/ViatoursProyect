@@ -1,4 +1,7 @@
-<script>
+<script setup>
+import { ref } from 'vue'
+
+const isRecordOpen = ref(false)
 </script>
 
 <template>
@@ -51,12 +54,14 @@
               </div>
             </div>
           </div>
-          <div class="box">
-            <div class="title">
+          <div class="box record">
+            <div class="title" :class="{ active: isRecordOpen }" @click="isRecordOpen = !isRecordOpen">
               <h4>Historial de recorridos</h4>
+              <i class="fa-solid fa-angle-down"></i>
             </div>
 
-            <div class="content-itinerary">
+
+            <div v-show="isRecordOpen" class="content-itinerary">
               <div class="card-itinerary">
                 <div class="data">
                   <div class="content">

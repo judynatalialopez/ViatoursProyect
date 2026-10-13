@@ -742,6 +742,30 @@ section.home {
         flex-direction: column;
         gap: 20px;
 
+        &.record {
+          .title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+
+            i {
+              transition: transform 0.3s ease;
+            }
+
+            &.active {
+              i {
+                transform: rotate(180deg);
+              }
+            }
+          }
+
+          .content-itinerary {
+            overflow: hidden;
+          }
+        }
+
         .title {
           width: 100%;
           display: flex;
