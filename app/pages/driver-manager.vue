@@ -25,6 +25,41 @@ const isRecordOpen = ref(false)
               <h4>Orden de itinerario</h4>
               <p>(Usuario puede ajustar el orden)</p>
             </div>
+            <div class="content-driver-place">
+              <div class="item">
+                <div class="title-place">
+                  <div class="circle">
+                    1
+                  </div>
+                  <p>Mina de sal</p>
+                </div>
+                <button class="icon red">
+                  Terminada
+                </button>
+              </div>
+              <div class="item">
+                <div class="title-place">
+                  <div class="circle">
+                    2
+                  </div>
+                  <p>Mina de sal</p>
+                </div>
+                <button class="icon yellow">
+                  En proceso
+                </button>
+              </div>
+              <div class="item">
+                <div class="title-place">
+                  <div class="circle">
+                    2
+                  </div>
+                  <p>Mina de sal</p>
+                </div>
+                <button class="icon">
+                  Por comenzar
+                </button>
+              </div>
+            </div>
           </div>
           <div class="box time">
             <div class="title border-bt">

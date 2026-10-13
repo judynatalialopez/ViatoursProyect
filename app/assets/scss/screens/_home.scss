@@ -806,6 +806,55 @@ section.home {
           }
         }
 
+        .content-driver-place {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 20px;
+          padding: 0 20px;
+
+          .item {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 1px solid $gray;
+
+            .title-place {
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+              gap: 11px;
+
+              p {
+                font-size: 18px;
+              }
+            }
+
+            .icon {
+              width: fit-content;
+              min-width: 101px;
+              border-radius: 5px;
+              background: transparent;
+              border: 1px solid $green;
+              font-weight: 600;
+              color: $green;
+              cursor: pointer;
+
+              &.red {
+                color: $red;
+                border: 1px solid $red;
+              }
+
+              &.yellow {
+                color: $yellow;
+                border: 1px solid $yellow;
+              }
+            }
+          }
+        }
+
         .payment-method {
           margin-top: 20px;
           padding-bottom: 20px;
