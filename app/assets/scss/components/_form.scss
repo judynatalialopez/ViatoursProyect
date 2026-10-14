@@ -55,7 +55,9 @@ form {
     font-size: 26px;
   }
 
-  input {
+  input,
+  select,
+  textarea {
     width: 100%;
     padding: 12px 10px;
     border-radius: 6px;

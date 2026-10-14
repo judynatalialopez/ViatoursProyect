@@ -126,20 +126,26 @@ function siguienteForm() {
           <div class="row">
             <div class="col">
               <label for="last-name-first">Primer apellido</label>
-              <input type="text" name="last-name-first" id="last-name-first" placeholder="Ej: Juan">
+              <input type="text" name="last-name-first" id="last-name-first" placeholder="Ej: Millan">
             </div>
             <div class="col">
               <label for="name-second">Segundo apellido</label>
-              <input type="text" name="last-name-second" id="last-name-second" placeholder="Ej: Manuel">
+              <input type="text" name="last-name-second" id="last-name-second" placeholder="Ej: Caceres">
             </div>
           </div>
           <div class="row">
-            <div class="icon">
-              <i class="fa-regular fa-id-card"></i>
-            </div>
             <div class="col">
               <label for="id">Número identificacón</label>
               <input type="number" name="id" id="id" placeholder="Ej: 1000000000">
+            </div>
+            <div class="col">
+              <label for="name-second">Tipo de identificación</label>
+              <select name="opcion" id="opcion" required>
+                <option value="" selected disabled>Selecciona una opción</option>
+                <option value="1">CE – Cédula de Ciudadanía</option>
+                <option value="2">CE – Cédula de Extranjería.</option>
+                <option value="3">PA – Pasaporte.</option>
+              </select>
             </div>
           </div>
           <div class="row">
