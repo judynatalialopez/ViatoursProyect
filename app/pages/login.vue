@@ -135,6 +135,15 @@ function siguienteForm() {
           </div>
           <div class="row">
             <div class="icon">
+              <i class="fa-regular fa-id-card"></i>
+            </div>
+            <div class="col">
+              <label for="id">Número identificacón</label>
+              <input type="number" name="id" id="id" placeholder="Ej: 1000000000">
+            </div>
+          </div>
+          <div class="row">
+            <div class="icon">
               <i class="fa-regular fa-envelope"></i>
             </div>
             <div class="col">
