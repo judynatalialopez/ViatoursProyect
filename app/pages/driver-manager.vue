@@ -251,7 +251,7 @@ onUnmounted(stopTimer)
               <div class="trip-items">
                 <div class="row">
                   <p><i class="fa-regular fa-hourglass-start"></i> <span>Hora inicio</span> · {{ formatDate(startDate)
-                    }} </p>
+                  }} </p>
                 </div>
                 <div class="row">
                   <p><i class="fa-regular fa-hourglass-end"></i> <span>Hora final</span> · {{ formatDate(endDate) }}
@@ -269,19 +269,13 @@ onUnmounted(stopTimer)
                 <form class="form-time" @submit.prevent="submitTime">
                   <div class="form-group">
                     <label>¿Cuánto tiempo deseas programar para el viaje?</label>
-                    <p>Ingresa las horas y los minutos del recorrido antes de comenzar.</p>
+                    <p>Ingresa las horas del recorrido antes de comenzar.</p>
                     <div class="time-inputs">
                       <div class="time-input">
                         <input id="hours" v-model.number="hours"
                           :disabled="tripStatus === 'running' || tripStatus === 'finished'" type="number" name="hours"
                           min="0" placeholder="0" aria-label="Horas adicionales" />
                         <span>Horas</span>
-                      </div>
-                      <div class="time-input">
-                        <input id="minutes" v-model.number="minutes"
-                          :disabled="tripStatus === 'running' || tripStatus === 'finished'" type="number" name="minutes"
-                          min="0" max="59" placeholder="0" aria-label="Minutos adicionales" />
-                        <span>Minutos</span>
                       </div>
                     </div>
                   </div>

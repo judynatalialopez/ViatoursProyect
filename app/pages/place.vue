@@ -25,6 +25,11 @@ const lugaresVisibles = computed(() =>
   lugaresFiltrados.value.slice(0, cantidadVisible.value)
 )
 
+const lugarNoEncontrado = computed(() =>
+  busqueda.value.trim().length > 0 &&
+  lugaresFiltrados.value.length === 0
+)
+
 watch(busqueda, () => {
   cantidadVisible.value = 4
 })
@@ -52,17 +57,28 @@ function verMenos() {
       <form class="search" @submit.prevent>
         <div>
           <input id="search" v-model="busqueda" type="search" name="search" placeholder="Buscar destino..." />
+
           <Button class="large" aria-label="Buscar destino">
             <i class="fa-solid fa-magnifying-glass"></i>
           </Button>
         </div>
-
-        <p v-if="!lugaresFiltrados.length" class="error">
-          No se encontró el lugar
-        </p>
       </form>
 
-      <div class="container-grid">
+      <!-- Mensaje cuando no hay resultados -->
+      <div v-if="lugarNoEncontrado" class="results" role="status">
+        <i class="fa-solid fa-location-dot"></i>
+
+        <h3>No se encontró el lugar</h3>
+
+        <p>
+          No encontramos destinos que coincidan con
+          "{{ busqueda.trim() }}".
+          Intenta buscar otro lugar.
+        </p>
+      </div>
+
+      <!-- Listado de lugares -->
+      <div v-else class="container-grid">
         <Card-page v-for="lugar in lugaresVisibles" :key="lugar.id"
           :recorridos-href="`/route-place?placeId=${lugar.id}`" :restaurantes-href="`/restaurant?placeId=${lugar.id}`">
           <template #img>
@@ -75,6 +91,7 @@ function verMenos() {
         </Card-page>
       </div>
 
+      <!-- Botones Ver más / Ver menos -->
       <div v-if="lugaresFiltrados.length > 4" class="content-see-more">
         <Button v-if="cantidadVisible < lugaresFiltrados.length" class="large" @click="verMas">
           Ver más
