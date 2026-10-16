@@ -36,7 +36,7 @@ form {
     display: flex;
     justify-content: flex-start;
     gap: 20px;
-    align-items: center;
+    align-items: flex-start;
   }
 
   label {
@@ -53,28 +53,6 @@ form {
     align-items: center;
     justify-content: center;
     font-size: 26px;
-  }
-
-  input,
-  select,
-  textarea {
-    width: 100%;
-    padding: 12px 10px;
-    border-radius: 6px;
-    box-shadow: inset 0px 0px 7px 5px rgb(2 127 56 / 19%);
-    border: 1px solid $green;
-    background: transparent;
-    color: $white;
-
-    &:focus {
-      outline: none;
-      border: 1px solid $yellow;
-      box-shadow: inset 0px 0px 7px 5px rgb(219 172 49 / 11%);
-    }
-
-    &::placeholder {
-      color: $gray;
-    }
   }
 
   .col {
@@ -139,3 +117,26 @@ form {
     display: none;
   }
 }
+
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px 10px;
+    border-radius: 6px;
+    box-shadow: inset 0px 0px 7px 5px rgb(2 127 56 / 19%);
+    border: 1px solid $green;
+    background: transparent;
+    color: $white;
+
+    &:focus {
+      outline: none;
+      border: 1px solid $yellow;
+      box-shadow: inset 0px 0px 7px 5px rgb(219 172 49 / 11%);
+    }
+
+    &::placeholder {
+      color: $gray;
+    }
+  }

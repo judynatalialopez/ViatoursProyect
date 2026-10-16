@@ -145,6 +145,21 @@ function continuar() {
         Este lugar todavía no tiene restaurantes disponibles.
       </p>
 
+      <form class="add_destination" aria-live="polite">
+        <span>¿Desea dirigirse a alguna ubicación personalizada?</span>
+        <div class="row">
+          <div class="colum">
+          <div class="box wd-70">
+          <input id="search" type="search" name="search" placeholder="Nombre o Direccion de destino" />
+          <button class="circle yellow"><i class="fa-solid fa-plus" ></i></button>
+          </div></div>
+          <div class="box wd-30">
+          <button class="circle yellow"><i class="fa-solid fa-x" ></i></button>
+          <button class="circle yellow"><i class="fa-solid fa-paper-plane" ></i></button>
+          </div>
+        </div>
+      </form>
+
       <div class="total" aria-live="polite">
         <strong>
           <span>Total: </span>
