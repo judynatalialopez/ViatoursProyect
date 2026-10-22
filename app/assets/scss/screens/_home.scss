@@ -1,1 +1,54 @@
 @use "../variables" as *;
+
+section.home {
+  min-height: 100vh;
+  @include bgcover;
+  overflow: hidden;
+
+  .before {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+
+    background: radial-gradient(ellipse 55% 100% at 0% 30%,
+        rgb(239 235 227 / 100%) 0%,
+        rgb(239 235 227 / 98%) 35%,
+        rgb(239 235 227 / 80%) 60%,
+        rgb(239 235 227 / 40%) 80%,
+        transparent 100%);
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    img {
+      max-width: 72px;
+      filter: brightness(0) saturate(100%) invert(69%) sepia(18%) saturate(845%) hue-rotate(356deg) brightness(94%) contrast(87%);
+    }
+
+    h3 {
+      color: $golden;
+      font-size: 11.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      max-width: 125px;
+    }
+  }
+
+  h1 {
+    max-width: 373px;
+  }
+
+  p {
+    color: $gray-03;
+    margin-top: 28px;
+    max-width: 43ch;
+    font-size: clamp(16px, 1.7vw, 19px);
+    line-height: 1.65;
+  }
+}

@@ -121,8 +121,8 @@ html {
 }
 
 body {
-	background-color: $black;
-	color: $white;
+	background-color: $white;
+	color: $black;
 	font-family: $archivo;
 	font-weight: 400;
 	font-size: 16px;
@@ -138,6 +138,14 @@ body {
 	max-width: 1200px;
 	margin: 0 auto;
 	position: relative;
+	z-index: 1;
+}
+
+h1 {
+	font-family: $newsreader;
+	font-size: clamp(42px, 6.2vw, 82px);
+	line-height: 95%;
+	font-weight: 100;
 }
 
 
