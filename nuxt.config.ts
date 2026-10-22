@@ -1,3 +1,4 @@
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
 
@@ -21,7 +22,7 @@ export default defineNuxtConfig({
         {
           rel: 'icon',
           type: 'image/png',
-          href: '/img/favicon.png',
+          href: '/img/icon-logo.png',
         },
         {
           rel: 'stylesheet',
@@ -38,7 +39,7 @@ export default defineNuxtConfig({
         },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap',
+          href: 'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap',
         },
       ],
     },

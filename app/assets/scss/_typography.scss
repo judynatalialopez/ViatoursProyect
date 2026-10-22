@@ -1,12 +1,38 @@
 // Poppins autoalojada. Solo los cuatro pesos que usa el diseno y solo
 // woff2: en la sala del cine cada kilobyte es tiempo de carga sobre una
 // conexion mala, y woff2 lo soporta cualquier navegador que llegue aqui.
-@each $name, $weight in ('Regular': 400, 'Medium': 500, 'SemiBold': 600, 'Bold': 700) {
-  @font-face {
-    font-family: 'Poppins';
-    src: url('/fonts/Poppins-#{$name}.woff2') format('woff2');
-    font-weight: $weight;
-    font-style: normal;
-    font-display: swap;
-  }
+@font-face {
+  font-family: 'Newsreader 16pt';
+  src: url('/fonts/Newsreader16pt-Italic.woff2') format('woff2'),
+    url('/fonts/Newsreader16pt-Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Newsreader 16pt';
+  src: url('/fonts/Newsreader16pt-Regular.woff2') format('woff2'),
+    url('/fonts/Newsreader16pt-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fonts/Archivo-SemiBoldItalic.woff2') format('woff2'),
+    url('/fonts/Archivo-SemiBoldItalic.woff') format('woff');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fonts/Archivo-SemiBold.woff2') format('woff2'),
+    url('/fonts/Archivo-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
