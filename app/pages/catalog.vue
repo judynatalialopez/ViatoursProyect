@@ -9,15 +9,15 @@ const activeTag = ref('')
 
     <div class="container">
       <div class="title-item">
-        <a href="/" class="return"><i class="fa-light fa-arrow-left-long"></i>VOLVER</a>
-        <h3>DESTINOS</h3>
-        <h1>¿A dónde quieres ir hoy?</h1>
-        <p>Cada destino tiene una historia por descubir. Explora nuestras recomendaciones y encuentra lugares que harán
-          especial tu visita.</p>
+        <a href="destination" class="return"><i class="fa-light fa-arrow-left-long"></i>VOLVER</a>
+        <h3>Bogotá</h3>
+        <h1>Bogotá</h1>
+        <p>Historia, cultura, gastronomia y experiencias únicas. Descubre nuestras recomendaciones y vive lo mejor de
+          cada uno de estos sitios.</p>
       </div>
     </div>
     <div class="content-bg">
-      <img src="/img/" alt="">
+      <img src="https://cdn1.matadornetwork.com/blogs/2/2016/02/Bogota-Colombia-cityscape-1200x853.jpeg" alt="">
     </div>
   </section>
 
