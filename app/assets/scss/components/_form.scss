@@ -1,0 +1,72 @@
+@use "../variables" as *;
+
+input,
+select {
+  width: 100%;
+  background: $beige;
+  padding: 15px 20px 15px 47px;
+  border-radius: 7px;
+  border: 1px solid $gray-02;
+  box-shadow: 1px 1px 5px 1px #00000024;
+
+  &:focus {
+    outline: none;
+    border: 1px solid $golden;
+  }
+}
+
+select {
+  padding: 7px 15px;
+}
+
+.content-tags {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  .tag {
+    padding: 10px 16px;
+    background: #f7f5f1;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 400ms ease;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+
+  span {
+    padding: 2px 8px;
+    border-radius: 15px;
+    background: $white;
+  }
+
+  i,
+  span {
+    color: $golden;
+  }
+}
+
+form.filters {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+
+  .filters {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+  }
+}
