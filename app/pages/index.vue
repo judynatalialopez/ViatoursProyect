@@ -1,12 +1,5 @@
-<script setup>
-import ButtonChange from '~/components/button-change.vue'
-const dark = ref(false)
-</script>
-
 <template>
-  <ButtonChange @change="dark = $event" />
-  <Button-link />
-  <section class="home" :class="{ dark: dark }"
+  <section class="home"
     style="background-image: url(https://uncovercolombia.com/site/assets/files/58956/colombia-tour-bogota-1.jpg?3mnxzw);">
     <div class="before"></div>
 

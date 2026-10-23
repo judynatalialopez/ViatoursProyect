@@ -1,11 +1,8 @@
 <script setup>
-const dark = ref(false)
-
-const emit = defineEmits(['change'])
+const dark = useState('dark-mode', () => false)
 
 function toggleDark() {
   dark.value = !dark.value
-  emit('change', dark.value)
 }
 </script>
 
