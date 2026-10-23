@@ -9,6 +9,10 @@ select {
   border: 1px solid $gray-02;
   box-shadow: 1px 1px 5px 1px #00000024;
 
+  &::placeholder {
+    color: $gray-03;
+  }
+
   &:focus {
     outline: none;
     border: 1px solid $golden;
@@ -17,6 +21,10 @@ select {
 
 select {
   padding: 7px 15px;
+}
+
+.sort-by {
+  width: 28%;
 }
 
 .content-tags {
@@ -30,16 +38,35 @@ select {
   .tag {
     padding: 10px 16px;
     background: #f7f5f1;
+    border: 1px solid transparent;
     border-radius: 22px;
+
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+
     cursor: pointer;
     transition: all 400ms ease;
 
+    color: #1b1b1b;
+
+    span {
+      opacity: 0.5;
+    }
+
     &:hover {
       transform: translateY(-5px);
+    }
+
+    &.active {
+      background: #1b1b1b;
+      color: #fff;
+      transform: translateY(0);
+
+      span {
+        opacity: 0.7;
+      }
     }
   }
 
@@ -55,13 +82,35 @@ select {
   }
 }
 
+.search {
+  width: 100%;
+  position: relative;
+
+  &::before {
+    content: "\f002";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: $faPro;
+    font-weight: 300;
+    font-size: 16px;
+    color: $gray-01;
+    pointer-events: none;
+  }
+}
+
 form.filters {
-  max-width: 80%;
+  max-width: 100%;
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
   align-items: flex-start;
   gap: 20px;
+
+  input {
+    width: 80%;
+  }
 
   .filters {
     width: 100%;
