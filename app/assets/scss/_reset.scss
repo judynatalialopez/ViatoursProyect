@@ -142,8 +142,8 @@ body {
 }
 
 h1 {
+	font-size: 82px;
 	font-family: $newsreader;
-	font-size: clamp(42px, 6.2vw, 82px);
 	line-height: 95%;
 	font-weight: 100;
 }

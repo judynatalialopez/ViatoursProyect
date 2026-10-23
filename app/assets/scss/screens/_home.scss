@@ -6,7 +6,7 @@ section.home {
   min-height: 100vh;
   padding: 60px 0 0 0;
   position: relative;
-
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -119,9 +119,8 @@ section.home {
     color: $gray-03;
     max-width: 43ch;
     font-size: 19px;
-    line-height: 1.65;
+    line-height: 130%;
     text-align: center;
-
     transition: color 700ms ease;
   }
 

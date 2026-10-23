@@ -1,0 +1,73 @@
+@use "../variables" as *;
+
+.title-item {
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+
+  .return {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    color: oklch(0.46 0.05 250);
+    letter-spacing: 3px;
+    transition: all 400ms ease;
+    margin-bottom: 20px;
+
+    &:hover {
+      color: oklch(36.092% 0.03835 250.377);
+    }
+  }
+
+  h3 {
+    width: fit-content;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    letter-spacing: 1px;
+    color: $golden;
+
+    &::before {
+      content: "";
+      position: relative;
+      display: block;
+      width: 40px;
+      height: 2px;
+      background: $golden;
+      top: initial;
+      transition: background-color 700ms ease;
+    }
+  }
+
+  p {
+    color: $gray-03;
+    font-size: 19px;
+    line-height: 130%;
+    text-align: left;
+    transition: color 700ms ease;
+  }
+}
+
+.before-item {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 70%;
+  pointer-events: none;
+  z-index: 1;
+
+  background: linear-gradient(to right,
+      rgba(239, 235, 227, 1) 0%,
+      rgba(239, 235, 227, 0.98) 35%,
+      rgba(239, 235, 227, 0.8) 60%,
+      rgba(239, 235, 227, 0.4) 80%,
+      rgba(239, 235, 227, 0) 100%);
+
+  transition: opacity 700ms ease;
+}
