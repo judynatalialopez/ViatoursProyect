@@ -168,7 +168,7 @@ h1 {
 	}
 
 	&::-webkit-scrollbar-thumb {
-		background: #01451e;
+		background: $green-dark;
 		border: none;
 		border-radius: 20px;
 		box-shadow: none;
@@ -176,7 +176,7 @@ h1 {
 
 	&::-webkit-scrollbar-thumb:hover,
 	&::-webkit-scrollbar-thumb:active {
-		background: #dbac31;
+		background: $gray-02;
 	}
 
 	&::-webkit-scrollbar-corner {
