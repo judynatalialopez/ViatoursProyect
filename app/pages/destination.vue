@@ -41,48 +41,54 @@
       </form>
 
       <div class="container-grid">
-        <div class="item">
+        <a href="" class="item">
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS51uAlE5twImZjwY6QBzENZjXl32tGXNqUODtOh9CQDY0iLlY6HFAGe9M2&s=10"
-            alt="bogota">
+            alt="Bogotá">
           <h3>Bogotá</h3>
-          <a href=""><i class="fa-regular fa-angle-right"></i></a>
-        </div>
-        <div class="item">
+          <i class="fa-regular fa-angle-right"></i>
+        </a>
+
+        <a href="" class="item">
           <img
             src="https://viajala.com.co/news/wp-content/uploads/2026/01/renovacion-del-centro-historico-de-Zipaquira.jpg"
-            alt="zipaquirá">
+            alt="Zipaquirá">
           <h3>Zipaquirá</h3>
-          <a href=""><i class="fa-regular fa-angle-right"></i></a>
-        </div>
-        <div class="item">
+          <i class="fa-regular fa-angle-right"></i>
+        </a>
+
+        <a href="" class="item">
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRinLkumlrp5gcToxdJImpZ1tTZ3-hpRPBA38k72gc7CGJxYBSDMia4DQc&s=10"
-            alt="villa de leyva">
-          <h3>Villa de leyva</h3>
-          <a href=""><i class="fa-regular fa-angle-right"></i></a>
-        </div>
-        <div class="item">
+            alt="Villa de Leyva">
+          <h3>Villa de Leyva</h3>
+          <i class="fa-regular fa-angle-right"></i>
+        </a>
+
+        <a href="" class="item">
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHdu-61HuAvmIFyEqXSQ1f5vVQmmYfZVpliOHTqjPOvNJ8pQ0QQxZc6uIw&s=10"
-            alt="villa de leyva">
+            alt="Boyacá">
           <h3>Boyacá</h3>
-          <a href=""><i class="fa-regular fa-angle-right"></i></a>
-        </div>
-        <div class="item">
+          <i class="fa-regular fa-angle-right"></i>
+        </a>
+
+        <a href="" class="item">
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZzPW32Rk8t4FpNc8Yk5qV0Zxfc3FRXbMkg0fNlBMSqoRCd7Uz0B0NJN-J&s=10"
-            alt="villavicencio">
+            alt="Villavicencio">
           <h3>Villavicencio</h3>
-          <a href=""><i class="fa-regular fa-angle-right"></i></a>
-        </div>
-        <div class="item">
+          <i class="fa-regular fa-angle-right"></i>
+        </a>
+
+        <a href="" class="item">
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPq_HDumpedSesXhY-jEOXobxu9o7NLwuSMc069LZipmQOf97W8X7EVMc&s=10"
-            alt="eje cafetero">
+            alt="Eje cafetero">
           <h3>Eje cafetero</h3>
-          <a href=""><i class="fa-regular fa-angle-right"></i></a>
-        </div>
+          <i class="fa-regular fa-angle-right"></i>
+        </a>
+
       </div>
     </div>
   </section>
