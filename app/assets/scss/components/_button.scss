@@ -53,6 +53,10 @@
   color: $beige-light;
   transition: all 400ms ease;
 
+  @media (max-width: 767px) {
+    top: 2%;
+  }
+
   &:hover {
     color: $black;
     background: $beige-light;
@@ -101,6 +105,10 @@
     gap 0.4s ease,
     background 0.4s ease,
     box-shadow 0.4s ease;
+
+  @media (max-width: 767px) {
+    top: 7%;
+  }
 
   i.fa-light.fa-star {
     color: oklch(0.72 0.09 78);

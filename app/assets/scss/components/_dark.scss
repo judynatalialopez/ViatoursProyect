@@ -1,0 +1,65 @@
+@use "../variables" as *;
+
+.dark {
+  section.home {
+
+    .before {
+      opacity: 0;
+    }
+
+    &::after {
+      opacity: 1;
+    }
+
+    h1 {
+      color: $white;
+    }
+
+    .content-title>p {
+      color: $gray-02;
+    }
+
+    .top {
+      h3 {
+        color: $golden;
+        border-left-color: $golden;
+      }
+
+      img {
+        filter: brightness(0) saturate(100%) invert(69%) sepia(18%) saturate(845%) hue-rotate(356deg) brightness(94%) contrast(87%);
+      }
+    }
+
+    .container-bottom {
+      .container {
+        background: rgba(18, 22, 28, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+
+      .item {
+        border-right-color: $golden;
+
+        h3 {
+          color: $golden;
+        }
+
+        p {
+          color: $gray-02;
+        }
+
+        i {
+          color: $golden;
+        }
+
+        &:last-child {
+          border-right: none;
+        }
+      }
+    }
+  }
+
+  section.destination {
+    background-color: $black;
+  }
+}
