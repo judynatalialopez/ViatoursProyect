@@ -55,11 +55,12 @@
 }
 
 .content-bg {
-  width: 60%;
-  height: 810px;
+  width: 50%;
+  height: 702px;
   position: absolute;
   top: 0;
   right: 0;
+  background: $white;
 
   img {
     @include imgCover;
@@ -70,7 +71,7 @@
   position: absolute;
   inset: 0;
   height: 100%;
-  width: 70%;
+  width: 90%;
   pointer-events: none;
   z-index: 1;
 
