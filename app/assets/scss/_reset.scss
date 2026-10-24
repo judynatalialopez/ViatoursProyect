@@ -1,0 +1,204 @@
+@use "variables" as *;
+
+* {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	box-sizing: border-box;
+	vertical-align: baseline;
+}
+
+img {
+	display: block;
+	width: auto;
+	max-width: 100%;
+	image-rendering: -webkit-optimize-contrast;
+}
+
+a {
+	display: block;
+	text-decoration: none;
+	font-size: inherit;
+	line-height: inherit;
+	color: inherit;
+}
+
+p {
+	font-size: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+}
+
+p a,
+label a,
+li a {
+	display: inline;
+}
+
+a:link {
+	text-decoration: none
+}
+
+a:hover {
+	text-decoration: none
+}
+
+a:visited {
+	text-decoration: none
+}
+
+b,
+strong {
+	font-weight: 700;
+}
+
+ul,
+ol {
+	font-family: inherit;
+	color: inherit;
+}
+
+li {
+	list-style-type: none;
+	font-family: inherit;
+	color: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
+input,
+textarea,
+select {
+	font-family: inherit;
+	font-size: inherit;
+}
+
+label {
+	display: block;
+}
+
+table,
+tr,
+td {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+fieldset {
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+
+fieldset legend {
+	margin-bottom: 10px;
+}
+
+.clear {
+	clear: both;
+}
+
+.slider *::selection {
+	background: transparent;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+	font-weight: inherit;
+	font-size: inherit;
+}
+
+// *:before, *:after{ font-family: 'Font Awesome 6 Pro'; }
+
+html {
+	overflow-x: hidden;
+	scroll-behavior: smooth;
+}
+
+body {
+	background-color: $beige-light;
+	color: $black;
+	font-family: $archivo;
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 1.5;
+	/*Definir mejor las letras y que no se vean borrosas*/
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	/*Fin definir las letras*/
+}
+
+.container {
+	width: calc(100% - 2rem);
+	max-width: 1200px;
+	margin: 0 auto;
+	position: relative;
+	z-index: 2;
+}
+
+h1 {
+	font-size: 82px;
+	font-family: $newsreader;
+	line-height: 95%;
+	font-weight: 100;
+	transition: all 400ms ease;
+
+	@media (max-width: 991px) {
+		font-size: 32px;
+	}
+}
+
+
+// Barras de scroll de la página y de todos los contenedores
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #01451e transparent;
+
+	&::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+		background: transparent;
+	}
+
+	&::-webkit-scrollbar-track,
+	&::-webkit-scrollbar-track-piece {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: $blue;
+		border: none;
+		border-radius: 20px;
+		box-shadow: none;
+	}
+
+	&::-webkit-scrollbar-thumb:hover,
+	&::-webkit-scrollbar-thumb:active {
+		background: $gray-02;
+	}
+
+	&::-webkit-scrollbar-corner {
+		background: transparent;
+	}
+
+	&::-webkit-scrollbar-button {
+		display: none;
+		width: 0;
+		height: 0;
+		background: transparent;
+	}
+}
+
+@supports selector(::-webkit-scrollbar) {
+	* {
+		scrollbar-width: auto;
+		scrollbar-color: auto;
+	}
+}

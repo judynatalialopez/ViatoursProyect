@@ -1,0 +1,929 @@
+// ============================================================
+
+// ANIMACIONES GLOBALES PARA SECTIONS
+
+// Solo animación. No modifica transform/filter ni elementos de capa.
+// Usa fill-mode backwards para liberar las propiedades al terminar.
+
+// ============================================================
+
+section {
+
+  --anim-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --anim-fast: 600ms;
+
+  --anim-normal: 850ms;
+
+  --anim-slow: 1100ms;
+
+  // ==========================================================
+
+  // ELEMENTOS GENERALES
+
+  // ==========================================================
+
+  h1,
+
+  h2,
+
+  h3,
+
+  h4,
+
+  h5,
+
+  h6,
+
+  p,
+
+  ul,
+
+  ol,
+
+  blockquote,
+
+  .return,
+
+  .btn,
+
+  button,
+
+  form,
+
+  input,
+
+  select,
+
+  textarea,
+
+  .search,
+
+  .filters,
+
+  .content-tags,
+
+  .tag,
+
+  .item,
+
+  .card,
+
+  .box,
+
+  .panel,
+
+
+
+
+
+
+  .icon,
+
+  .stat,
+
+  .number,
+
+  .no-results {
+
+    animation:
+
+      sectionFadeUp var(--anim-normal) var(--anim-ease) backwards;
+
+  }
+
+  // ==========================================================
+
+  // TITULARES
+
+  // ==========================================================
+
+  h1 {
+
+    animation-delay: 160ms;
+
+  }
+
+  h2 {
+
+    animation-delay: 160ms;
+
+  }
+
+  h3 {
+
+    animation-delay: 100ms;
+
+  }
+
+  h4,
+
+  h5,
+
+  h6 {
+
+    animation-delay: 120ms;
+
+  }
+
+  // ==========================================================
+
+  // TEXTOS
+
+  // ==========================================================
+
+  p {
+
+    animation-delay: 240ms;
+
+  }
+
+  ul,
+
+  ol,
+
+  blockquote {
+
+    animation-delay: 260ms;
+
+  }
+
+  // ==========================================================
+
+  // BOTONES Y LINKS
+
+  // ==========================================================
+
+  .return,
+
+  .btn,
+
+  button {
+
+    animation-delay: 320ms;
+
+  }
+
+  // ==========================================================
+
+  // FORMULARIOS
+
+  // ==========================================================
+
+  form {
+
+    animation-delay: 120ms;
+
+  }
+
+  input,
+
+  select,
+
+  textarea {
+
+    animation-delay: 180ms;
+
+  }
+
+  .search {
+
+    animation-delay: 150ms;
+
+  }
+
+  .filters {
+
+    animation-delay: 120ms;
+
+  }
+
+  // ==========================================================
+
+  // TITLE ITEM
+
+  // ==========================================================
+
+  .title-item {
+
+    .return {
+
+      animation:
+
+        sectionFadeLeft 750ms var(--anim-ease) 40ms backwards;
+
+    }
+
+    >h3 {
+
+      animation:
+
+        sectionFadeUp 750ms var(--anim-ease) 100ms backwards;
+
+      &::before {
+
+        transform-origin: left center;
+
+        animation:
+
+          sectionLineReveal 900ms var(--anim-ease) 120ms backwards;
+
+      }
+
+    }
+
+    >h1,
+
+    >h2 {
+
+      animation:
+
+        sectionTitleReveal var(--anim-slow) var(--anim-ease) 160ms backwards;
+
+    }
+
+    >p {
+
+      animation:
+
+        sectionFadeUp var(--anim-normal) var(--anim-ease) 280ms backwards;
+
+    }
+
+    >.btn {
+
+      animation:
+
+        sectionFadeUp var(--anim-normal) var(--anim-ease) 380ms backwards;
+
+    }
+
+  }
+
+  // CONTENT BACKGROUND
+  // No se anima: puede participar en capas/z-index y estilos dark.
+
+  // BEFORE / OVERLAYS
+  // No se animan overlays: se conserva intacto su stacking context.
+
+  // ==========================================================
+
+  // GRIDS
+
+  // ==========================================================
+
+  .container-grid,
+
+  .grid,
+
+  .cards,
+
+  .items {
+
+    >* {
+
+      animation:
+
+        sectionFadeUp var(--anim-normal) var(--anim-ease) backwards;
+
+    }
+
+    >*:nth-child(1) {
+
+      animation-delay: 100ms;
+
+    }
+
+    >*:nth-child(2) {
+
+      animation-delay: 160ms;
+
+    }
+
+    >*:nth-child(3) {
+
+      animation-delay: 220ms;
+
+    }
+
+    >*:nth-child(4) {
+
+      animation-delay: 280ms;
+
+    }
+
+    >*:nth-child(5) {
+
+      animation-delay: 340ms;
+
+    }
+
+    >*:nth-child(6) {
+
+      animation-delay: 400ms;
+
+    }
+
+    >*:nth-child(7) {
+
+      animation-delay: 460ms;
+
+    }
+
+    >*:nth-child(8) {
+
+      animation-delay: 520ms;
+
+    }
+
+    >*:nth-child(9) {
+
+      animation-delay: 580ms;
+
+    }
+
+    >*:nth-child(10) {
+
+      animation-delay: 640ms;
+
+    }
+
+    >*:nth-child(11) {
+
+      animation-delay: 700ms;
+
+    }
+
+    >*:nth-child(12) {
+
+      animation-delay: 760ms;
+
+    }
+
+  }
+
+  // ==========================================================
+
+  // TAGS
+
+  // ==========================================================
+
+  .content-tags {
+
+    .tag {
+
+      animation:
+
+        sectionFadeUp 700ms var(--anim-ease) backwards;
+
+    }
+
+    .tag:nth-child(1) {
+
+      animation-delay: 80ms;
+
+    }
+
+    .tag:nth-child(2) {
+
+      animation-delay: 130ms;
+
+    }
+
+    .tag:nth-child(3) {
+
+      animation-delay: 180ms;
+
+    }
+
+    .tag:nth-child(4) {
+
+      animation-delay: 230ms;
+
+    }
+
+    .tag:nth-child(5) {
+
+      animation-delay: 280ms;
+
+    }
+
+    .tag:nth-child(6) {
+
+      animation-delay: 330ms;
+
+    }
+
+    .tag:nth-child(7) {
+
+      animation-delay: 380ms;
+
+    }
+
+    .tag:nth-child(8) {
+
+      animation-delay: 430ms;
+
+    }
+
+  }
+
+  // ==========================================================
+
+  // NO RESULTS
+
+  // ==========================================================
+
+  .no-results {
+
+    animation:
+
+      sectionFadeUp 600ms var(--anim-ease) backwards;
+
+  }
+
+  // ==========================================================
+
+  // CLASES MANUALES OPCIONALES
+
+  // ==========================================================
+
+  .anim-up {
+
+    animation:
+
+      sectionFadeUp var(--anim-normal) var(--anim-ease) backwards;
+
+  }
+
+  .anim-down {
+
+    animation:
+
+      sectionFadeDown var(--anim-normal) var(--anim-ease) backwards;
+
+  }
+
+  .anim-left {
+
+    animation:
+
+      sectionFadeLeft var(--anim-normal) var(--anim-ease) backwards;
+
+  }
+
+  .anim-right {
+
+    animation:
+
+      sectionFadeRight var(--anim-normal) var(--anim-ease) backwards;
+
+  }
+
+  .anim-fade {
+
+    animation:
+
+      sectionFade var(--anim-normal) var(--anim-ease) backwards;
+
+  }
+
+  .anim-scale {
+
+    animation:
+
+      sectionScale var(--anim-slow) var(--anim-ease) backwards;
+
+  }
+
+  .anim-blur {
+
+    animation:
+
+      sectionBlur var(--anim-slow) var(--anim-ease) backwards;
+
+  }
+
+  // ==========================================================
+
+  // DELAYS MANUALES
+
+  // ==========================================================
+
+  @for $i from 1 through 12 {
+
+    .delay-#{$i} {
+
+      animation-delay: #{$i * 80}ms !important;
+
+    }
+
+  }
+
+}
+
+// ============================================================
+
+// HOME
+
+// ============================================================
+
+section.home {
+
+  .content-title {
+
+    .top {
+
+      animation:
+
+        sectionFadeUp 800ms cubic-bezier(0.16, 1, 0.3, 1) 80ms backwards;
+
+    }
+
+    h1 {
+
+      animation:
+
+        sectionTitleReveal 1100ms cubic-bezier(0.16, 1, 0.3, 1) 160ms backwards;
+
+    }
+
+    >p {
+
+      animation:
+
+        sectionFadeUp 850ms cubic-bezier(0.16, 1, 0.3, 1) 300ms backwards;
+
+    }
+
+    >.btn {
+
+      animation:
+
+        sectionFadeUp 850ms cubic-bezier(0.16, 1, 0.3, 1) 400ms backwards;
+
+    }
+
+  }
+
+  .container-bottom {
+
+    animation:
+
+      homeBottomReveal 1100ms cubic-bezier(0.16, 1, 0.3, 1) 450ms backwards;
+
+    .item:nth-child(1) {
+
+      animation-delay: 520ms;
+
+    }
+
+    .item:nth-child(2) {
+
+      animation-delay: 620ms;
+
+    }
+
+    .item:nth-child(3) {
+
+      animation-delay: 720ms;
+
+    }
+
+  }
+
+}
+
+// ============================================================
+
+// DESTINATION COVER
+
+// ============================================================
+
+section.destination.cover {
+
+  .title-item {
+
+    .return {
+
+      animation-delay: 50ms;
+
+    }
+
+    >h3 {
+
+      animation-delay: 120ms;
+
+    }
+
+    >h1 {
+
+      animation-delay: 200ms;
+
+    }
+
+    >p {
+
+      animation-delay: 320ms;
+
+    }
+
+  }
+
+}
+
+// ============================================================
+
+// DESTINATION PLACES
+
+// ============================================================
+
+section.destination.container-places {
+
+  form.filters {
+
+    animation:
+
+      sectionFadeUp 850ms var(--anim-ease) backwards;
+
+  }
+
+  .container-grid {
+
+    .item {
+
+      animation:
+
+        sectionFadeUp 850ms var(--anim-ease) backwards;
+
+    }
+
+  }
+
+}
+
+// ============================================================
+
+// KEYFRAMES
+
+// ============================================================
+
+@keyframes homeBottomReveal {
+
+  from {
+
+    opacity: 0;
+
+    translate: 0 24px;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    translate: none;
+
+  }
+
+}
+
+@keyframes sectionFadeUp {
+
+  from {
+
+    opacity: 0;
+
+    translate: 0 24px;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    translate: none;
+
+  }
+
+}
+
+@keyframes sectionFadeDown {
+
+  from {
+
+    opacity: 0;
+
+    translate: 0 -24px;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    translate: none;
+
+  }
+
+}
+
+@keyframes sectionFadeLeft {
+
+  from {
+
+    opacity: 0;
+
+    translate: -30px 0;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    translate: none;
+
+  }
+
+}
+
+@keyframes sectionFadeRight {
+
+  from {
+
+    opacity: 0;
+
+    translate: 30px 0;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    translate: none;
+
+  }
+
+}
+
+@keyframes sectionFade {
+
+  from {
+
+    opacity: 0;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+  }
+
+}
+
+@keyframes sectionScale {
+
+  from {
+
+    opacity: 0;
+
+    scale: 0.96;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    scale: none;
+
+  }
+
+}
+
+@keyframes sectionBlur {
+
+  from {
+
+    opacity: 0;
+
+    translate: 0 18px;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    translate: none;
+
+  }
+
+}
+
+@keyframes sectionTitleReveal {
+
+  from {
+
+    opacity: 0;
+
+    translate: 0 32px;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    translate: none;
+
+  }
+
+}
+
+@keyframes sectionImageZoom {
+
+  from {
+
+    opacity: 0;
+
+    scale: 1.05;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    scale: none;
+
+  }
+
+}
+
+@keyframes sectionOverlayReveal {
+
+  from {
+
+    opacity: 0;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+  }
+
+}
+
+@keyframes sectionLineReveal {
+
+  from {
+
+    opacity: 0;
+
+    scale: 0 1;
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    scale: 1 1;
+
+  }
+
+}
+
+// ============================================================
+
+// REDUCED MOTION
+
+// ============================================================
+
+@media (prefers-reduced-motion: reduce) {
+
+  section {
+
+    *,
+
+    *::before,
+
+    *::after {
+
+      animation-duration: 0.01ms !important;
+
+      animation-delay: 0ms !important;
+
+      transition-duration: 0.01ms !important;
+
+    }
+
+  }
+
+}

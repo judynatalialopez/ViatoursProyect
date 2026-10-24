@@ -1,0 +1,68 @@
+// Paleta
+$black: #12161c;
+$gray-01: rgb(18, 22, 28);
+$gray-02: rgba(255, 255, 255, 0.72);
+$gray-03: rgb(121 121 127);
+$white: #FFF;
+$beige: #f7f5f1;
+$beige-light: rgb(239, 235, 227);
+$golden: oklch(0.72 0.09 78);
+
+$red: oklch(36.125% 0.08592 22.31);
+$green: oklch(0.45 0.09 152);
+$blue: oklch(0.46 0.05 250);
+
+// Tipografia
+$newsreader: 'Newsreader 16pt', sans-serif;
+$archivo: 'Archivo', sans-serif;
+$faPro: 'Font Awesome 6 Pro';
+
+i {
+  font-family: $faPro;
+}
+
+// MIXIN
+@mixin bgcover {
+  // background-image: url("../img/image.jpg");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+}
+
+@mixin before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+@mixin imgCover {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+// ANIMATION
+
+@keyframes aparecerTitulo {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  h1 {
+    animation: none;
+  }
+}

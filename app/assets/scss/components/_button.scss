@@ -1,0 +1,172 @@
+@use "../variables" as *;
+
+.btn {
+  width: fit-content;
+  background: $golden;
+  color: $white;
+  padding: 15px 30px;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  transition: all 400ms ease;
+
+  &:hover {
+    background: oklch(0.85 0.08 78);
+
+    i {
+      transform: translateX(13px);
+    }
+  }
+
+  i {
+    font-weight: 300;
+    font-size: 20px;
+    transition: all 400ms ease;
+  }
+}
+
+.light-toggle {
+  position: fixed;
+  right: 3%;
+  top: 5%;
+  z-index: 10;
+  background: $gray-01;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 46px;
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  color: $beige-light;
+  transition: all 400ms ease;
+
+  @media (max-width: 767px) {
+    top: 2%;
+  }
+
+  &:hover {
+    color: $black;
+    background: $beige-light;
+  }
+
+  &.dark {
+    color: $black;
+    background: $beige-light;
+
+    &:hover {
+      color: $beige-light;
+      background: $gray-01;
+    }
+  }
+
+  i {
+    font-size: 17px;
+  }
+}
+
+.btn-opt {
+  position: fixed;
+  right: 3%;
+  top: 11%;
+  z-index: 10;
+
+  background: rgb(18, 22, 28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 46px;
+
+  color: white;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+
+  transition:
+    width 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    gap 0.4s ease,
+    background 0.4s ease,
+    box-shadow 0.4s ease;
+
+  @media (max-width: 767px) {
+    top: 7%;
+  }
+
+  i.fa-light.fa-star {
+    color: oklch(0.72 0.09 78);
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: transform 0.4s ease;
+  }
+
+  span {
+    display: block;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition:
+      max-width 0.5s ease,
+      opacity 0.3s ease;
+  }
+
+  &:hover,
+  &:focus-visible {
+    width: 145px;
+    gap: 10px;
+    background: #252a30;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    i.fa-light.fa-star {
+      transform: rotate(25deg);
+    }
+
+    span {
+      max-width: 90px;
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid #c6a36b;
+    outline-offset: 3px;
+  }
+}
+
+@media (hover: none) {
+  .btn-opt {
+    width: 145px;
+    gap: 10px;
+
+    span {
+      max-width: 90px;
+      opacity: 1;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .btn-opt,
+  .btn-opt i,
+  .btn-opt span {
+    transition: none;
+  }
+}
