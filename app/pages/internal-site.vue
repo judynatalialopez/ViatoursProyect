@@ -1,6 +1,6 @@
 <script setup>
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Navigation, Pagination } from 'swiper/modules'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 
 import 'swiper/css'
 import 'swiper/css/navigation'
@@ -15,7 +15,8 @@ const sliderImages = [
 
 const modules = [
   Navigation,
-  Pagination
+  Pagination,
+  Autoplay
 ]
 </script>
 
@@ -103,7 +104,11 @@ const modules = [
         :navigation="sliderImages.length > 3" :pagination="sliderImages.length > 3
           ? { clickable: true }
           : false
-          " :breakpoints="{
+          " :autoplay="{
+            delay: 6000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true
+          }" :breakpoints="{
             768: {
               slidesPerView: 2,
               spaceBetween: 16
