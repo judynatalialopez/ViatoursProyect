@@ -411,7 +411,7 @@ section.opinion {
       padding: 0 0 24px;
 
       flex-direction: row;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: center;
       gap: 24px;
     }
@@ -438,8 +438,8 @@ section.opinion {
     }
 
     .google-qr__code {
-      width: 105px;
-      height: 105px;
+      width: 168px;
+      height: 168px;
       min-width: 105px;
     }
 
@@ -452,7 +452,6 @@ section.opinion {
       width: auto;
       min-width: 190px;
       margin-top: 0;
-      margin-left: auto;
     }
   }
 
