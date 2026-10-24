@@ -1,9 +1,9 @@
 {
-  "_hash": "2YCkgzw6RIJ1n1ifS2N4kPWWi8y5alzJbyIeLNd4KNY",
+  "_hash": "CY4b9zt-vb",
   "project": {
-    "rootDir": "C:/ViatoursProyect"
+    "rootDir": "/Applications/XAMPP/xamppfiles/htdocs/ViatoursProyect"
   },
   "versions": {
-    "nuxt": "4.5.2"
+    "nuxt": "4.6.2"
   }
 }

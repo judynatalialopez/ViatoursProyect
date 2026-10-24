@@ -3,20 +3,17 @@
 /// <reference path="shared-app.config.d.ts" />
 /// <reference path="runtime-config.d.ts" />
 /// <reference path="../../node_modules/@nuxt/nitro-server/dist/augments.d.mts" />
-/// <reference path="middleware.d.ts" />
+/// <reference path="nitro-middleware.d.ts" />
 /// <reference path="../schema/nuxt.schema.d.ts" />
 
-import type { RuntimeConfig } from 'nuxt/schema'
+import type { RouteRuleConfigExtensions, RuntimeConfig, RuntimeConfigApp } from 'nuxt/schema'
 import type { H3Event } from 'h3'
-import type { LogObject } from 'consola'
-import type { NuxtIslandContext, NuxtIslandResponse, NuxtRenderChunkContext, NuxtRenderCloseContext, NuxtRenderHTMLContext, NuxtRenderRouteContext } from '#app/types'
+import type { DevServerLog, NuxtIslandContext, NuxtIslandResponse, NuxtRenderChunkContext, NuxtRenderCloseContext, NuxtRenderHTMLContext, NuxtRenderRouteContext } from '#app/types'
 
 declare module 'nitropack' {
-  interface NitroRuntimeConfigApp {
-    buildAssetsDir: string
-    cdnURL: string
-  }
   interface NitroRuntimeConfig extends RuntimeConfig {}
+  interface NitroRuntimeConfigApp extends RuntimeConfigApp {}
+  interface NitroRouteConfig extends RouteRuleConfigExtensions {}
   interface NitroRouteConfig {
     ssr?: boolean
     streaming?: boolean
@@ -34,7 +31,7 @@ declare module 'nitropack' {
     appLayout?: string | false
   }
   interface NitroRuntimeHooks {
-    'dev:ssr-logs': (ctx: { logs: LogObject[], path: string }) => void | Promise<void>
+    'dev:ssr-logs': (ctx: { logs: DevServerLog[], path: string }) => void | Promise<void>
     'render:html': (htmlContext: NuxtRenderHTMLContext, context: { event: H3Event, streaming?: boolean }) => void | Promise<void>
     'render:html:chunk': (chunkContext: NuxtRenderChunkContext, context: { event: H3Event }) => void | Promise<void>
     'render:html:close': (closeContext: NuxtRenderCloseContext, context: { event: H3Event }) => void | Promise<void>
@@ -43,11 +40,9 @@ declare module 'nitropack' {
   }
 }
 declare module 'nitropack/types' {
-  interface NitroRuntimeConfigApp {
-    buildAssetsDir: string
-    cdnURL: string
-  }
   interface NitroRuntimeConfig extends RuntimeConfig {}
+  interface NitroRuntimeConfigApp extends RuntimeConfigApp {}
+  interface NitroRouteConfig extends RouteRuleConfigExtensions {}
   interface NitroRouteConfig {
     ssr?: boolean
     streaming?: boolean
@@ -65,7 +60,7 @@ declare module 'nitropack/types' {
     appLayout?: string | false
   }
   interface NitroRuntimeHooks {
-    'dev:ssr-logs': (ctx: { logs: LogObject[], path: string }) => void | Promise<void>
+    'dev:ssr-logs': (ctx: { logs: DevServerLog[], path: string }) => void | Promise<void>
     'render:html': (htmlContext: NuxtRenderHTMLContext, context: { event: H3Event, streaming?: boolean }) => void | Promise<void>
     'render:html:chunk': (chunkContext: NuxtRenderChunkContext, context: { event: H3Event }) => void | Promise<void>
     'render:html:close': (closeContext: NuxtRenderCloseContext, context: { event: H3Event }) => void | Promise<void>
