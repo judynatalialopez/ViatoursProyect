@@ -238,8 +238,7 @@
 
             <div class="google-qr__code">
 
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://www.google.com/"
-                alt="Código QR">
+              <img src="/img/qr.png" alt="Código QR">
 
             </div>
 
