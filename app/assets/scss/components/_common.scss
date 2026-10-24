@@ -7,6 +7,13 @@
   align-items: flex-start;
   gap: 20px;
 
+  @media (max-width: 991px) {
+    background: rgb(0 0 0 / 0%);
+    backdrop-filter: blur(8px);
+    padding: 10px;
+    border-radius: 10px;
+  }
+
   .return {
     width: fit-content;
     display: flex;
@@ -51,6 +58,11 @@
     line-height: 130%;
     text-align: left;
     transition: color 700ms ease;
+
+    @media (max-width: 991px) {
+      color: $black;
+      font-size: 16px;
+    }
   }
 }
 
@@ -61,6 +73,10 @@
   top: 0;
   right: 0;
   background: $white;
+
+  @media (max-width: 991px) {
+    width: 100%;
+  }
 
   img {
     @include imgCover;
@@ -78,6 +94,11 @@
   background: linear-gradient(to right, rgb(239 235 227) 0%, rgb(239 235 227) 35%, rgb(239 235 227) 60%, rgb(239 235 227 / 74%) 80%, rgb(239 235 227 / 0%) 100%);
 
   transition: opacity 700ms ease;
+
+  @media (max-width: 991px) {
+    width: 100%;
+    background: linear-gradient(to bottom, rgb(239, 235, 227) 0%, rgba(239, 235, 227, 0.98) 25%, rgba(239, 235, 227, 0.85) 45%, rgba(239, 235, 227, 0.5) 65%, rgba(239, 235, 227, 0) 100%);
+  }
 }
 
 .no-results {

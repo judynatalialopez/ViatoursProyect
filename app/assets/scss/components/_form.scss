@@ -120,5 +120,14 @@ form.filters {
     align-items: flex-end;
     justify-content: space-between;
     gap: 20px;
+    transition: all 400ms ease;
+
+    @media (max-width: 991px) {
+      flex-direction: column;
+
+      .sort-by {
+        width: 100%;
+      }
+    }
   }
 }

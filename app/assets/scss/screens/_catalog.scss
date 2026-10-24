@@ -205,11 +205,20 @@ section.internal {
                 font-size: 13px;
                 color: $blue;
                 margin-bottom: 2px;
+
+                @media (max-width: 767px) {
+                    color: $black;
+                    font-weight: 800;
+                }
             }
 
             p {
                 color: $black;
                 font-size: 12px;
+
+                @media (max-width: 767px) {
+                    font-weight: 500;
+                }
             }
 
             i {

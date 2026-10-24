@@ -202,6 +202,10 @@
 
   .before-item {
     background: linear-gradient(to right, rgb(18 22 28) 0%, rgb(18 22 28) 35%, rgb(18 22 28) 60%, rgb(18 22 28 / 72%) 80%, rgba(18, 22, 28, 0) 100%);
+
+    @media (max-width: 991px) {
+      background: linear-gradient(to bottom, rgb(18 22 28) 0%, rgb(18 22 28) 25%, rgb(18 22 28 / 91%) 45%, rgb(18 22 28 / 83%) 65%, rgb(18 22 28 / 10%) 100%);
+    }
   }
 
   .content-bg {
@@ -258,7 +262,7 @@
 
   section.home {
     .before {
-      opacity: 0;
+      background: linear-gradient(to right, rgb(0 0 0) 0%, rgb(0 0 0 / 98%) 35%, rgb(0 0 0 / 80%) 60%, rgb(0 0 0 / 22%) 80%, rgb(0 0 0 / 0%) 100%);
     }
 
     &::after {
@@ -289,6 +293,7 @@
         background: rgba(18, 22, 28, 0.85);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
+        box-shadow: 1px 1px 9px 3px #ffffff54;
       }
 
       .item {

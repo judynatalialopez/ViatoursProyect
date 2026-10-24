@@ -146,6 +146,11 @@ h1 {
 	font-family: $newsreader;
 	line-height: 95%;
 	font-weight: 100;
+	transition: all 400ms ease;
+
+	@media (max-width: 991px) {
+		font-size: 32px;
+	}
 }
 
 
