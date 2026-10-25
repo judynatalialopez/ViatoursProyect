@@ -1,8 +1,18 @@
 <script setup>
 const dark = useState('dark-mode', () => false)
 
+onMounted(() => {
+  const savedDark = localStorage.getItem('dark-mode')
+
+  if (savedDark !== null) {
+    dark.value = savedDark === 'true'
+  }
+})
+
 function toggleDark() {
   dark.value = !dark.value
+
+  localStorage.setItem('dark-mode', String(dark.value))
 }
 </script>
 

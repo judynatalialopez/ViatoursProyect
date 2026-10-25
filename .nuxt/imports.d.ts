@@ -34,5 +34,5 @@ export { requestIdleCallback, cancelIdleCallback } from '#app/compat/idle-callba
 export { setInterval } from '#app/compat/interval';
 export { definePageMeta, PageMeta } from '#app/composables/pages';
 export { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
-export { useAdminData, Destination, CatalogPlace } from '../app/composables/useAdminData';
+export { useApi, Destination, Category, CatalogPlace } from '../app/composables/useAdminData';
 export { useNuxtDevTools } from '../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';

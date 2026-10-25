@@ -658,8 +658,10 @@ const _inlineRuntimeConfig = {
       }
     }
   },
-  "appSecret": "850fedfe05109ded28278edd096e38cd0a40a9517ceca3bf1f0cf8da4bf36812",
-  "public": {}
+  "appSecret": "d436a62988bdc9416c1dea2a6693e93697c66bb6d96cd90bb43e801403d4388b",
+  "public": {
+    "apiBase": "http://localhost:4000/api"
+  }
 };
 const envOptions = {
   prefix: "NITRO_",

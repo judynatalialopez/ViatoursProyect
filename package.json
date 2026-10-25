@@ -8,7 +8,9 @@
     "dev:host": "nuxt dev --host --qr",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "dev:api": "npm --prefix server run dev",
+    "db:setup": "npm --prefix server run db:setup"
   },
   "dependencies": {
     "nuxt": "^4.5.2",

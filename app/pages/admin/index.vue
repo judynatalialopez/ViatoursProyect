@@ -1,967 +1,846 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useAdminData } from '~/composables/useAdminData'
+import type { CatalogPlace, Category, Destination } from '~/composables/useAdminData'
 
-import type { CatalogPlace, Destination } from '~/composables/useAdminData'
+const { destinations, categories, places, load, request } = useAdminData()
 
-const { destinations, places } = useAdminData()
+const activeSection = ref<'places' | 'destinations' | 'categories'>('places')
 
-const activeSection = ref<'places' | 'destinations'>('places')
 const search = ref('')
 const statusFilter = ref<'all' | 'active' | 'inactive'>('all')
+
 const modalOpen = ref(false)
+const adminDark = ref(false)
 const editingId = ref<number | null>(null)
+const error = ref('')
 
 const deleteTarget = ref<{
-  type: 'place' | 'destination'
+  type: 'place' | 'destination' | 'category'
   id: number
   name: string
 } | null>(null)
 
 const emptyPlace = (): CatalogPlace => ({
   id: 0,
+  destinationId: destinations.value[0]?.id || 0,
+  categoryId: 0,
   name: '',
-  category: 'restaurantes',
-  categoryName: 'RESTAURANTE',
+  category: '',
+  categoryName: '',
   description: '',
   phone: '',
+  address: '',
   image: '',
+  url: '',
   date_create: '',
-  active: true
+  active: true,
 })
 
 const emptyDestination = (): Destination => ({
   id: 0,
   name: '',
   image: '',
-  link: '',
-  active: true
+  link: '/catalog',
+  active: true,
+})
+
+const emptyCategory = (): Category => ({
+  id: 0,
+  name: '',
+  slug: '',
+  icon: 'fa-light fa-tag',
+  active: true,
 })
 
 const placeForm = reactive<CatalogPlace>(emptyPlace())
 const destinationForm = reactive<Destination>(emptyDestination())
+const categoryForm = reactive<Category>(emptyCategory())
 
-onMounted(() => {
-  if (sessionStorage.getItem('viatours-admin-session') !== 'active') {
-    navigateTo('/admin/login')
-  }
-})
+const iconOptions = [
+  { label: 'Etiqueta', value: 'fa-light fa-tag' },
+  { label: 'Restaurante', value: 'fa-light fa-utensils' },
+  { label: 'Experiencia / mapa', value: 'fa-light fa-map' },
+  { label: 'Joyería', value: 'fa-light fa-gem' },
+  { label: 'Café', value: 'fa-light fa-mug-hot' },
+  { label: 'Hotel', value: 'fa-light fa-hotel' },
+  { label: 'Compras', value: 'fa-light fa-bag-shopping' },
+  { label: 'Naturaleza', value: 'fa-light fa-leaf' },
+  { label: 'Cultura', value: 'fa-light fa-landmark' },
+  { label: 'Noche', value: 'fa-light fa-martini-glass' },
+  { label: 'Playa', value: 'fa-light fa-umbrella-beach' },
+  { label: 'Bienestar', value: 'fa-light fa-spa' },
+  { label: 'Aventura', value: 'fa-light fa-person-hiking' },
+]
+
+const addGalleryImage = () => {
+  if (!placeForm.gallery) placeForm.gallery = []
+  placeForm.gallery.push('')
+}
+
+const removeGalleryImage = (index: number) => {
+  placeForm.gallery?.splice(index, 1)
+}
+
+const toggleAdminTheme = () => {
+  adminDark.value = !adminDark.value
+  if (import.meta.client) localStorage.setItem('viatours-admin-theme', adminDark.value ? 'dark' : 'light')
+}
+
+const availableCategories = computed(() => categories.value)
 
 const filteredPlaces = computed(() => {
   const term = search.value.trim().toLowerCase()
 
-  return places.value.filter(item => {
+  return places.value.filter((item) => {
     const matchesSearch =
       !term ||
       item.name.toLowerCase().includes(term) ||
       item.categoryName.toLowerCase().includes(term) ||
-      item.phone.includes(term)
+      (item.phone || '').toLowerCase().includes(term)
 
     const matchesStatus =
       statusFilter.value === 'all' ||
-      (statusFilter.value === 'active'
-        ? item.active
-        : !item.active)
+      (statusFilter.value === 'active' ? item.active : !item.active)
 
     return matchesSearch && matchesStatus
   })
+})
+
+const groupedPlaces = computed(() => {
+  return destinations.value
+    .map((destination) => ({
+      destination,
+      places: filteredPlaces.value.filter(
+        (place) => place.destinationId === destination.id,
+      ),
+    }))
+    .filter((group) => group.places.length > 0)
 })
 
 const filteredDestinations = computed(() => {
   const term = search.value.trim().toLowerCase()
 
-  return destinations.value.filter(item => {
-    const matchesSearch =
-      !term ||
-      item.name.toLowerCase().includes(term)
+  return destinations.value.filter(
+    (item) =>
+      (!term || item.name.toLowerCase().includes(term)) &&
+      (statusFilter.value === 'all' ||
+        (statusFilter.value === 'active' ? item.active : !item.active)),
+  )
+})
 
-    const matchesStatus =
-      statusFilter.value === 'all' ||
-      (statusFilter.value === 'active'
-        ? item.active
-        : !item.active)
+const filteredCategories = computed(() => {
+  const term = search.value.trim().toLowerCase()
 
-    return matchesSearch && matchesStatus
-  })
+  return categories.value.filter(
+    (item) =>
+      (!term || item.name.toLowerCase().includes(term)) &&
+      (statusFilter.value === 'all' ||
+        (statusFilter.value === 'active' ? item.active : !item.active)),
+  )
 })
 
 const stats = computed(() => ({
   destinations: destinations.value.length,
   places: places.value.length,
-
-  restaurants: places.value.filter(
-    item => item.category === 'restaurantes'
-  ).length,
-
-  experiences: places.value.filter(
-    item => item.category === 'experiencia'
-  ).length,
-
-  jewelry: places.value.filter(
-    item => item.category === 'joyeria'
-  ).length
 }))
+
+const categoryStats = computed(() => categories.value.map(category => ({
+  ...category,
+  count: places.value.filter(item => item.categoryId === category.id).length,
+})))
 
 const formatDate = (date: string) => {
   if (!date) return '—'
 
-  const parsedDate = new Date(date)
+  const parsed = new Date(date)
 
-  if (Number.isNaN(parsedDate.getTime())) {
-    return date
-  }
+  if (Number.isNaN(parsed.getTime())) return date
 
   return new Intl.DateTimeFormat('es-CO', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
-  }).format(parsedDate)
+    minute: '2-digit',
+  }).format(parsed)
+}
+
+const ensureAuth = async () => {
+  try {
+    await request('/auth/me')
+    await load()
+  } catch {
+    await navigateTo('/admin/login')
+  }
+}
+
+onMounted(() => {
+  adminDark.value = localStorage.getItem('viatours-admin-theme') === 'dark'
+  ensureAuth()
+})
+
+const setSection = (section: 'places' | 'destinations' | 'categories') => {
+  activeSection.value = section
+  search.value = ''
+  statusFilter.value = 'all'
+  error.value = ''
 }
 
 const openCreate = () => {
   editingId.value = null
+  error.value = ''
 
   if (activeSection.value === 'places') {
     Object.assign(placeForm, emptyPlace())
-  } else {
+    placeForm.categoryId = availableCategories.value[0]?.id || 0
+  } else if (activeSection.value === 'destinations') {
     Object.assign(destinationForm, emptyDestination())
+  } else {
+    Object.assign(categoryForm, emptyCategory())
   }
 
   modalOpen.value = true
 }
 
-const openEditPlace = (item: CatalogPlace) => {
+const openEditPlace = async (item: CatalogPlace) => {
   editingId.value = item.id
-
-  Object.assign(placeForm, {
-    ...item
-  })
-
+  error.value = ''
+  try {
+    const detail = await request<CatalogPlace>(`/places/${item.id}`)
+    Object.assign(placeForm, detail, { gallery: [...(detail.gallery || [])] })
+  } catch {
+    Object.assign(placeForm, item, { gallery: [] })
+  }
   modalOpen.value = true
 }
 
 const openEditDestination = (item: Destination) => {
   editingId.value = item.id
-
-  Object.assign(destinationForm, {
-    ...item
-  })
-
+  Object.assign(destinationForm, item)
   modalOpen.value = true
 }
 
-const updateCategoryName = () => {
-  const labels = {
-    restaurantes: 'RESTAURANTE',
-    joyeria: 'JOYERIA',
-    experiencia: 'EXPERIENCIA'
-  } as const
-
-  placeForm.categoryName = labels[placeForm.category]
+const openEditCategory = (item: Category) => {
+  editingId.value = item.id
+  Object.assign(categoryForm, item)
+  modalOpen.value = true
 }
 
-const saveItem = () => {
-  if (activeSection.value === 'places') {
-    updateCategoryName()
+const saveItem = async () => {
+  error.value = ''
 
-    /*
-     * CREAR LUGAR
-     */
-    if (editingId.value === null) {
-      const nextId =
-        Math.max(
-          0,
-          ...places.value.map(item => item.id)
-        ) + 1
-
-      places.value.push({
-        ...placeForm,
-        id: nextId,
-
-        // Fecha y hora automáticas.
-        date_create: new Date().toISOString()
-      })
-    }
-
-    /*
-     * EDITAR LUGAR
-     */
-    else {
-      const index = places.value.findIndex(
-        item => item.id === editingId.value
-      )
-
-      if (index !== -1) {
-        /*
-         * Conservamos la fecha original de creación.
-         */
-        const originalDate =
-          places.value[index]?.date_create || ''
-
-        places.value[index] = {
-          ...placeForm,
-          id: editingId.value,
-          date_create: originalDate
-        }
+  try {
+    if (activeSection.value === 'places') {
+      const body = {
+        destinationId: placeForm.destinationId,
+        categoryId: placeForm.categoryId,
+        name: placeForm.name,
+        description: placeForm.description,
+        phone: placeForm.phone,
+        address: placeForm.address || '',
+        image: placeForm.image,
+        gallery: (placeForm.gallery || []).map(item => item.trim()).filter(Boolean),
+        active: placeForm.active,
       }
-    }
-  }
 
-  /*
-   * DESTINOS
-   */
-  else {
-    if (editingId.value === null) {
-      const nextId =
-        Math.max(
-          0,
-          ...destinations.value.map(item => item.id)
-        ) + 1
-
-      destinations.value.push({
-        ...destinationForm,
-        id: nextId
+      await request(`/places${editingId.value ? `/${editingId.value}` : ''}`, {
+        method: editingId.value ? 'PUT' : 'POST',
+        body,
+      })
+    } else if (activeSection.value === 'destinations') {
+      await request(`/destinations${editingId.value ? `/${editingId.value}` : ''}`, {
+        method: editingId.value ? 'PUT' : 'POST',
+        body: {
+          name: destinationForm.name,
+          image: destinationForm.image,
+          active: destinationForm.active,
+        },
       })
     } else {
-      const index = destinations.value.findIndex(
-        item => item.id === editingId.value
-      )
-
-      if (index !== -1) {
-        destinations.value[index] = {
-          ...destinationForm,
-          id: editingId.value
-        }
-      }
+      await request(`/categories${editingId.value ? `/${editingId.value}` : ''}`, {
+        method: editingId.value ? 'PUT' : 'POST',
+        body: {
+          name: categoryForm.name,
+          icon: categoryForm.icon,
+          active: categoryForm.active,
+        },
+      })
     }
+
+    await load()
+    modalOpen.value = false
+  } catch (e: any) {
+    error.value = e?.data?.message || 'No fue posible guardar los cambios.'
   }
-
-  modalOpen.value = false
 }
 
-const togglePlace = (item: CatalogPlace) => {
-  item.active = !item.active
+const togglePlace = async (item: CatalogPlace) => {
+  await request(`/places/${item.id}`, {
+    method: 'PUT',
+    body: {
+      ...item,
+      active: !item.active,
+    },
+  })
+
+  await load()
 }
 
-const toggleDestination = (item: Destination) => {
-  item.active = !item.active
+const toggleDestination = async (item: Destination) => {
+  await request(`/destinations/${item.id}`, {
+    method: 'PUT',
+    body: {
+      name: item.name,
+      image: item.image,
+      active: !item.active,
+    },
+  })
+
+  await load()
+}
+
+const toggleCategory = async (item: Category) => {
+  await request(`/categories/${item.id}`, {
+    method: 'PUT',
+    body: {
+      name: item.name,
+      icon: item.icon,
+      active: !item.active,
+    },
+  })
+
+  await load()
 }
 
 const askDelete = (
-  type: 'place' | 'destination',
+  type: 'place' | 'destination' | 'category',
   id: number,
-  name: string
+  name: string,
 ) => {
   deleteTarget.value = {
     type,
     id,
-    name
+    name,
   }
 }
 
-const confirmDelete = () => {
+const confirmDelete = async () => {
   if (!deleteTarget.value) return
 
-  const {
-    type,
-    id
-  } = deleteTarget.value
+  error.value = ''
 
-  if (type === 'place') {
-    places.value = places.value.filter(
-      item => item.id !== id
-    )
-  } else {
-    destinations.value = destinations.value.filter(
-      item => item.id !== id
-    )
+  try {
+    const path =
+      deleteTarget.value.type === 'place'
+        ? 'places'
+        : deleteTarget.value.type === 'destination'
+          ? 'destinations'
+          : 'categories'
+
+    await request(`/${path}/${deleteTarget.value.id}`, {
+      method: 'DELETE',
+    })
+
+    deleteTarget.value = null
+    await load()
+  } catch (e: any) {
+    error.value = e?.data?.message || 'No fue posible eliminar el registro.'
+    deleteTarget.value = null
   }
-
-  deleteTarget.value = null
 }
 
 const logout = async () => {
-  sessionStorage.removeItem('viatours-admin-session')
-
-  await navigateTo('/admin/login')
-}
-
-const setSection = (
-  section: 'places' | 'destinations'
-) => {
-  activeSection.value = section
-
-  search.value = ''
-  statusFilter.value = 'all'
+  try {
+    await request('/auth/logout', {
+      method: 'POST',
+    })
+  } finally {
+    await navigateTo('/admin/login')
+  }
 }
 </script>
 
 <template>
-  <main class="admin-shell">
-
-    <!-- SIDEBAR -->
+  <main class="admin-shell" :class="{ 'admin-dark': adminDark }">
     <aside class="admin-sidebar">
-
       <a href="/" class="admin-sidebar__brand">
         <img src="/img/icon-mount.png" alt="Viatours">
 
         <div>
-          <strong>
-            VIATOURS
-          </strong>
-
-          <span>
-            ADMINISTRACIÓN
-          </span>
+          <strong>VIATOURS</strong>
+          <span>ADMINISTRACIÓN</span>
         </div>
       </a>
 
       <nav class="admin-nav">
-
-        <button :class="{
-          active: activeSection === 'places'
-        }" @click="setSection('places')">
+        <button :class="{ active: activeSection === 'places' }" @click="setSection('places')">
           <i class="fa-light fa-map-location-dot"></i>
-
           Lugares
-
-          <span>
-            {{ stats.places }}
-          </span>
+          <span>{{ stats.places }}</span>
         </button>
 
-        <button :class="{
-          active: activeSection === 'destinations'
-        }" @click="setSection('destinations')">
+        <button :class="{ active: activeSection === 'destinations' }" @click="setSection('destinations')">
           <i class="fa-light fa-location-dot"></i>
-
           Destinos
-
-          <span>
-            {{ stats.destinations }}
-          </span>
+          <span>{{ stats.destinations }}</span>
         </button>
 
+        <button :class="{ active: activeSection === 'categories' }" @click="setSection('categories')">
+          <i class="fa-light fa-tags"></i>
+          Categorías
+          <span>{{ categories.length }}</span>
+        </button>
       </nav>
 
       <div class="admin-sidebar__footer">
-
         <a href="/" target="_blank">
           <i class="fa-light fa-arrow-up-right-from-square"></i>
-
           Ver sitio
         </a>
 
         <button @click="logout">
           <i class="fa-light fa-arrow-right-from-bracket"></i>
-
           Cerrar sesión
         </button>
-
       </div>
-
     </aside>
 
-    <!-- CONTENT -->
     <section class="admin-content">
-
-      <!-- TOPBAR -->
       <header class="admin-topbar">
-
         <div>
-          <span>
-            Panel de administración
-          </span>
+          <span>Panel de administración</span>
 
           <h1>
             {{
               activeSection === 'places'
                 ? 'Lugares'
-                : 'Destinos'
+                : activeSection === 'destinations'
+                  ? 'Destinos'
+                  : 'Categorías'
             }}
           </h1>
         </div>
 
         <button class="btn" @click="openCreate">
           <i class="fa-light fa-plus"></i>
-
           {{
             activeSection === 'places'
               ? 'NUEVO LUGAR'
-              : 'NUEVO DESTINO'
+              : activeSection === 'destinations'
+                ? 'NUEVO DESTINO'
+                : 'NUEVA CATEGORÍA'
           }}
         </button>
-
       </header>
 
-      <!-- STATS -->
-      <div class="admin-stats">
+      <div class="admin-stats-scroll">
+        <div class="admin-stats">
+          <article>
+            <i class="fa-light fa-location-dot"></i>
+            <div>
+              <strong>{{ stats.destinations }}</strong>
+              <span>Destinos</span>
+            </div>
+          </article>
 
-        <article>
+          <article>
+            <i class="fa-light fa-map-location-dot"></i>
+            <div>
+              <strong>{{ stats.places }}</strong>
+              <span>Lugares</span>
+            </div>
+          </article>
 
-          <i class="fa-light fa-location-dot"></i>
-
-          <div>
-            <strong>
-              {{ stats.destinations }}
-            </strong>
-
-            <span>
-              Destinos
-            </span>
-          </div>
-
-        </article>
-
-        <article>
-
-          <i class="fa-light fa-map-location-dot"></i>
-
-          <div>
-            <strong>
-              {{ stats.places }}
-            </strong>
-
-            <span>
-              Lugares
-            </span>
-          </div>
-
-        </article>
-
-        <article>
-
-          <i class="fa-light fa-utensils"></i>
-
-          <div>
-            <strong>
-              {{ stats.restaurants }}
-            </strong>
-
-            <span>
-              Restaurantes
-            </span>
-          </div>
-
-        </article>
-
-        <article>
-
-          <i class="fa-light fa-map"></i>
-
-          <div>
-            <strong>
-              {{ stats.experiences }}
-            </strong>
-
-            <span>
-              Experiencias
-            </span>
-          </div>
-
-        </article>
-
-        <article>
-
-          <i class="fa-light fa-gem"></i>
-
-          <div>
-            <strong>
-              {{ stats.jewelry }}
-            </strong>
-
-            <span>
-              Joyerías
-            </span>
-          </div>
-
-        </article>
-
+          <article v-for="category in categoryStats" :key="category.id">
+            <i :class="category.icon || 'fa-light fa-tag'"></i>
+            <div>
+              <strong>{{ category.count }}</strong>
+              <span>{{ category.name }}</span>
+            </div>
+          </article>
+        </div>
       </div>
 
-      <!-- CARD -->
       <section class="admin-card">
-
-        <!-- TOOLBAR -->
         <div class="admin-toolbar">
-
           <div class="admin-search">
-
             <i class="fa-light fa-magnifying-glass"></i>
 
             <input v-model="search" type="text" :placeholder="activeSection === 'places'
               ? 'Buscar lugar, categoría o teléfono...'
-              : 'Buscar destino...'
+              : activeSection === 'destinations'
+                ? 'Buscar destino...'
+                : 'Buscar categoría...'
               ">
-
           </div>
 
           <select v-model="statusFilter">
-
-            <option value="all">
-              Todos los estados
-            </option>
-
-            <option value="active">
-              Activos
-            </option>
-
-            <option value="inactive">
-              Inactivos
-            </option>
-
+            <option value="all">Todos los estados</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
           </select>
-
         </div>
 
-        <!-- TABLE -->
+        <p v-if="error" class="admin-login__error">
+          {{ error }}
+        </p>
+
         <div class="admin-table-wrap">
+          <template v-if="activeSection === 'places'">
+            <div v-for="group in groupedPlaces" :key="group.destination.id" class="admin-destination-group">
+              <div class="admin-destination-group__header">
+                <div>
+                  <span>DESTINO</span>
+                  <h2>{{ group.destination.name }}</h2>
+                </div>
 
-          <!-- LUGARES -->
-          <table v-if="activeSection === 'places'" class="admin-table">
+                <span class="admin-destination-group__count">
+                  {{ group.places.length }}
+                  {{ group.places.length === 1 ? 'lugar' : 'lugares' }}
+                </span>
+              </div>
 
-            <thead>
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Lugar</th>
+                    <th>Categoría</th>
+                    <th>Teléfono</th>
+                    <th>Creación</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
 
-              <tr>
-                <th>
-                  Lugar
-                </th>
+                <tbody>
+                  <tr v-for="item in group.places" :key="item.id">
+                    <td>
+                      <div class="admin-record">
+                        <img :src="item.image" :alt="item.name">
 
-                <th>
-                  Categoría
-                </th>
+                        <div>
+                          <strong>{{ item.name }}</strong>
+                        </div>
+                      </div>
+                    </td>
 
-                <th>
-                  Teléfono
-                </th>
-
-                <th>
-                  Creación
-                </th>
-
-                <th>
-                  Estado
-                </th>
-
-                <th>
-                  Acciones
-                </th>
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              <tr v-for="item in filteredPlaces" :key="item.id">
-
-                <td>
-
-                  <div class="admin-record">
-
-                    <img :src="item.image" :alt="item.name">
-
-                    <div>
-                      <strong>
-                        {{ item.name }}
-                      </strong>
-                    </div>
-
-                  </div>
-
-                </td>
-
-                <td>
-
-                  <span class="admin-category">
-                    {{ item.categoryName }}
-                  </span>
-
-                </td>
-
-                <td>
-                  {{ item.phone || '—' }}
-                </td>
-
-                <td>
-                  {{ formatDate(item.date_create) }}
-                </td>
-
-                <td>
-
-                  <button class="admin-status" :class="{
-                    inactive: !item.active
-                  }" @click="togglePlace(item)">
-
-                    <span></span>
-
-                    {{
-                      item.active
-                        ? 'Activo'
-                        : 'Inactivo'
-                    }}
-
-                  </button>
-
-                </td>
-
-                <td>
-
-                  <div class="admin-actions">
-
-                    <button title="Editar" @click="openEditPlace(item)">
-                      <i class="fa-light fa-pen"></i>
-                    </button>
-
-                    <button class="danger" title="Eliminar" @click="
-                      askDelete(
-                        'place',
-                        item.id,
-                        item.name
-                      )
-                      ">
-                      <i class="fa-light fa-trash"></i>
-                    </button>
-
-                  </div>
-
-                </td>
-
-              </tr>
-
-            </tbody>
-
-          </table>
-
-          <!-- DESTINOS -->
-          <table v-else class="admin-table">
-
-            <thead>
-
-              <tr>
-
-                <th>
-                  Destino
-                </th>
-
-                <th>
-                  Enlace
-                </th>
-
-                <th>
-                  Estado
-                </th>
-
-                <th>
-                  Acciones
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              <tr v-for="item in filteredDestinations" :key="item.id">
-
-                <td>
-
-                  <div class="admin-record">
-
-                    <img :src="item.image" :alt="item.name">
-
-                    <div>
-
-                      <strong>
-                        {{ item.name }}
-                      </strong>
-
-                      <span>
-                        ID {{ item.id }}
+                    <td>
+                      <span class="admin-category">
+                        {{ item.categoryName }}
                       </span>
+                    </td>
 
+                    <td>
+                      {{ item.phone || '—' }}
+                    </td>
+
+                    <td>
+                      {{ formatDate(item.date_create) }}
+                    </td>
+
+                    <td>
+                      <button class="admin-status" :class="{ inactive: !item.active }" @click="togglePlace(item)">
+                        <span></span>
+                        {{ item.active ? 'Activo' : 'Inactivo' }}
+                      </button>
+                    </td>
+
+                    <td>
+                      <div class="admin-actions">
+                        <button title="Editar" @click="openEditPlace(item)">
+                          <i class="fa-light fa-pen"></i>
+                        </button>
+
+                        <button class="danger" title="Eliminar" @click="askDelete('place', item.id, item.name)">
+                          <i class="fa-light fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
+
+          <table v-else-if="activeSection === 'destinations'" class="admin-table">
+            <thead>
+              <tr>
+                <th>Destino</th>
+                <th>Enlace</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-for="item in filteredDestinations" :key="item.id">
+                <td>
+                  <div class="admin-record">
+                    <img :src="item.image" :alt="item.name">
+
+                    <div>
+                      <strong>{{ item.name }}</strong>
+                      <span>ID {{ item.id }}</span>
                     </div>
-
                   </div>
-
                 </td>
 
-                <td>
-                  {{ item.link }}
-                </td>
+                <td>{{ item.link }}</td>
 
                 <td>
-
-                  <button class="admin-status" :class="{
-                    inactive: !item.active
-                  }" @click="toggleDestination(item)">
-
+                  <button class="admin-status" :class="{ inactive: !item.active }" @click="toggleDestination(item)">
                     <span></span>
-
-                    {{
-                      item.active
-                        ? 'Activo'
-                        : 'Inactivo'
-                    }}
-
+                    {{ item.active ? 'Activo' : 'Inactivo' }}
                   </button>
-
                 </td>
 
                 <td>
-
                   <div class="admin-actions">
-
                     <button title="Editar" @click="openEditDestination(item)">
                       <i class="fa-light fa-pen"></i>
                     </button>
 
-                    <button class="danger" title="Eliminar" @click="
-                      askDelete(
-                        'destination',
-                        item.id,
-                        item.name
-                      )
-                      ">
+                    <button class="danger" title="Eliminar" @click="askDelete('destination', item.id, item.name)">
                       <i class="fa-light fa-trash"></i>
                     </button>
-
                   </div>
-
                 </td>
-
               </tr>
-
             </tbody>
-
           </table>
 
-          <!-- EMPTY -->
+          <table v-else class="admin-table">
+            <thead>
+              <tr>
+                <th>Categoría</th>
+                <th>Icono</th>
+                <th>Lugares</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-for="item in filteredCategories" :key="item.id">
+                <td>
+                  <span class="admin-category">
+                    {{ item.name.toUpperCase() }}
+                  </span>
+                </td>
+
+                <td><i :class="item.icon || 'fa-light fa-tag'" class="admin-category-icon"></i></td>
+
+                <td>{{ item.placeCount || 0 }}</td>
+
+                <td>
+                  <button class="admin-status" :class="{ inactive: !item.active }" @click="toggleCategory(item)">
+                    <span></span>
+                    {{ item.active ? 'Activo' : 'Inactivo' }}
+                  </button>
+                </td>
+
+                <td>
+                  <div class="admin-actions">
+                    <button title="Editar" @click="openEditCategory(item)">
+                      <i class="fa-light fa-pen"></i>
+                    </button>
+
+                    <button class="danger" title="Eliminar" @click="askDelete('category', item.id, item.name)">
+                      <i class="fa-light fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
           <div v-if="
             activeSection === 'places'
-              ? !filteredPlaces.length
-              : !filteredDestinations.length
+              ? !groupedPlaces.length
+              : activeSection === 'destinations'
+                ? !filteredDestinations.length
+                : !filteredCategories.length
           " class="admin-empty">
-
             <i class="fa-light fa-magnifying-glass"></i>
-
-            <p>
-              No encontramos resultados con esos filtros.
-            </p>
-
+            <p>No encontramos resultados con esos filtros.</p>
           </div>
-
         </div>
-
       </section>
-
     </section>
 
-    <!-- MODAL CREAR / EDITAR -->
     <div v-if="modalOpen" class="admin-modal" @click.self="modalOpen = false">
-
       <div class="admin-modal__dialog">
-
-        <!-- HEADER -->
         <div class="admin-modal__header">
-
           <div>
-
-            <span>
-              {{
-                editingId === null
-                  ? 'CREAR'
-                  : 'EDITAR'
-              }}
-            </span>
+            <span>{{ editingId === null ? 'CREAR' : 'EDITAR' }}</span>
 
             <h2>
               {{
                 activeSection === 'places'
                   ? 'Lugar'
-                  : 'Destino'
+                  : activeSection === 'destinations'
+                    ? 'Destino'
+                    : 'Categoría'
               }}
             </h2>
-
           </div>
 
           <button type="button" @click="modalOpen = false">
             <i class="fa-light fa-xmark"></i>
           </button>
-
         </div>
 
-        <!-- FORM -->
         <form class="admin-form" @submit.prevent="saveItem">
-
-          <!-- LUGAR -->
           <template v-if="activeSection === 'places'">
-
             <label class="admin-form__wide">
-
-              <span>
-                Nombre
-              </span>
-
+              <span>Nombre</span>
               <input v-model="placeForm.name" required type="text">
-
             </label>
 
             <label>
-
-              <span>
-                Categoría
-              </span>
-
-              <select v-model="placeForm.category" @change="updateCategoryName">
-
-                <option value="restaurantes">
-                  Restaurantes
+              <span>Destino</span>
+              <select v-model.number="placeForm.destinationId" required>
+                <option v-for="item in destinations" :key="item.id" :value="item.id">
+                  {{ item.name }}
                 </option>
-
-                <option value="joyeria">
-                  Joyería
-                </option>
-
-                <option value="experiencia">
-                  Experiencia
-                </option>
-
               </select>
-
             </label>
 
             <label>
+              <span>Categoría</span>
+              <select v-model.number="placeForm.categoryId" required>
+                <option v-for="item in availableCategories" :key="item.id" :value="item.id">
+                  {{ item.name }}
+                </option>
+              </select>
+            </label>
 
-              <span>
-                Teléfono
-              </span>
-
+            <label>
+              <span>Teléfono</span>
               <input v-model="placeForm.phone" type="text">
+            </label>
 
+            <label>
+              <span>Dirección del lugar</span>
+              <input v-model="placeForm.address" required type="text" placeholder="Ej. Cra. 7 #26-62">
+              <small class="admin-form__hint">Escribe la dirección física exacta donde está ubicado el sitio.</small>
             </label>
 
             <label class="admin-form__wide">
-
-              <span>
-                Descripción
-              </span>
-
+              <span>Descripción</span>
               <textarea v-model="placeForm.description" required rows="4"></textarea>
-
             </label>
 
             <label class="admin-form__wide">
-
-              <span>
-                URL de imagen
-              </span>
-
-              <input v-model="placeForm.image" required type="url">
-
+              <span>Imagen de portada</span>
+              <input v-model="placeForm.image" required type="url" placeholder="https://...">
+              <small class="admin-form__hint">La portada también se incluirá como primera imagen del slider.</small>
             </label>
 
-          </template>
+            <div class="admin-gallery admin-form__wide">
+              <div class="admin-gallery__header">
+                <div>
+                  <span>Imágenes adicionales del slider</span>
+                  <small>Añade tantas imágenes como necesites. Total actual: {{ 1 + (placeForm.gallery?.length || 0) }}
+                    contando la portada.</small>
+                </div>
+                <button type="button" class="admin-btn-secondary" @click="addGalleryImage">
+                  <i class="fa-light fa-plus"></i> AÑADIR IMAGEN
+                </button>
+              </div>
 
-          <!-- DESTINO -->
-          <template v-else>
-
-            <label class="admin-form__wide">
-
-              <span>
-                Nombre
-              </span>
-
-              <input v-model="destinationForm.name" required type="text">
-
-            </label>
-
-            <label class="admin-form__wide">
-
-              <span>
-                URL de imagen
-              </span>
-
-              <input v-model="destinationForm.image" required type="url">
-
-            </label>
-
-            <label class="admin-form__wide">
-
-              <span>
-                Enlace
-              </span>
-
-              <input v-model="destinationForm.link" required type="text">
-
-            </label>
-
-          </template>
-
-          <!-- STATUS -->
-          <label class="admin-toggle-row admin-form__wide">
-
-            <div>
-
-              <span>
-                Estado
-              </span>
-
-              <small>
-                Controla si el registro está activo.
-              </small>
-
+              <div v-if="placeForm.gallery?.length" class="admin-gallery__list">
+                <div v-for="(_, index) in placeForm.gallery" :key="index" class="admin-gallery__row">
+                  <span>{{ index + 2 }}</span>
+                  <input v-model="placeForm.gallery[index]" type="url" :placeholder="`URL imagen ${index + 2}`">
+                  <button type="button" title="Quitar imagen" @click="removeGalleryImage(index)">
+                    <i class="fa-light fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <p v-else class="admin-gallery__empty">Solo se mostrará la portada hasta que añadas más imágenes.</p>
             </div>
+          </template>
 
+          <template v-else-if="activeSection === 'destinations'">
+            <label class="admin-form__wide">
+              <span>Nombre</span>
+              <input v-model="destinationForm.name" required type="text">
+            </label>
+
+            <label class="admin-form__wide">
+              <span>URL de imagen</span>
+              <input v-model="destinationForm.image" required type="url">
+            </label>
+
+            <label class="admin-form__wide">
+              <span>Enlace</span>
+              <input v-model="destinationForm.link" type="text" readonly>
+            </label>
+          </template>
+
+          <template v-else>
+            <label class="admin-form__wide">
+              <span>Nombre</span>
+              <input v-model="categoryForm.name" required type="text">
+            </label>
+
+            <label class="admin-form__wide">
+              <span>Icono de Font Awesome</span>
+              <div class="admin-icon-picker">
+                <div class="admin-icon-picker__preview"><i :class="categoryForm.icon || 'fa-light fa-tag'"></i></div>
+                <select v-model="categoryForm.icon">
+                  <option v-for="icon in iconOptions" :key="icon.value" :value="icon.value">{{ icon.label }} — {{
+                    icon.value }}</option>
+                </select>
+              </div>
+              <input v-model="categoryForm.icon" class="admin-icon-class" type="text" placeholder="fa-light fa-tag">
+              <small class="admin-form__hint">Puedes elegir uno de la lista o escribir cualquier clase disponible en
+                Font Awesome Pro 6.5.1.</small>
+            </label>
+          </template>
+
+          <label class="admin-form__status admin-form__wide">
             <input v-if="activeSection === 'places'" v-model="placeForm.active" type="checkbox">
+            <input v-else-if="activeSection === 'destinations'" v-model="destinationForm.active" type="checkbox">
+            <input v-else v-model="categoryForm.active" type="checkbox">
 
-            <input v-else v-model="destinationForm.active" type="checkbox">
-
+            <span>Registro activo</span>
           </label>
 
-          <!-- FOOTER -->
-          <div class="admin-modal__footer admin-form__wide">
+          <p v-if="error" class="admin-login__error admin-form__wide">
+            {{ error }}
+          </p>
 
+          <div class="admin-modal__footer admin-form__wide">
             <button type="button" class="admin-btn-secondary" @click="modalOpen = false">
               CANCELAR
             </button>
 
             <button type="submit" class="btn">
               GUARDAR CAMBIOS
-
               <i class="fa-solid fa-arrow-right"></i>
             </button>
-
           </div>
-
         </form>
-
       </div>
-
     </div>
 
-    <!-- MODAL ELIMINAR -->
     <div v-if="deleteTarget" class="admin-modal admin-modal--confirm" @click.self="deleteTarget = null">
-
       <div class="admin-confirm">
-
         <div class="admin-confirm__icon">
           <i class="fa-light fa-trash"></i>
         </div>
 
-        <h2>
-          Eliminar registro
-        </h2>
+        <h2>Eliminar registro</h2>
 
         <p>
           ¿Seguro que quieres eliminar
-          <strong>
-            {{ deleteTarget.name }}
-          </strong>?
+          <strong>{{ deleteTarget.name }}</strong>?
         </p>
 
         <div>
-
           <button class="admin-btn-secondary" @click="deleteTarget = null">
             CANCELAR
           </button>
@@ -969,12 +848,8 @@ const setSection = (
           <button class="admin-btn-danger" @click="confirmDelete">
             ELIMINAR
           </button>
-
         </div>
-
       </div>
-
     </div>
-
   </main>
 </template>

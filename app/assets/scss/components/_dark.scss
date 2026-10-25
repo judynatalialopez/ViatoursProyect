@@ -492,4 +492,117 @@
       background: $golden;
     }
   }
+
+  /* Dark mode only for the administration area */
+  .admin-shell {
+    background: #11161d;
+    color: $white;
+
+    .admin-content {
+      background: #11161d;
+    }
+
+    .admin-sidebar {
+      background: #090d12;
+      border-right: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .admin-topbar h1,
+    .admin-record strong,
+    .admin-modal__header h2,
+    .admin-confirm h2 {
+      color: $white;
+    }
+
+    .admin-stats article,
+    .admin-card,
+    .admin-modal__dialog,
+    .admin-confirm {
+      background: #1a2028;
+      border-color: rgba(255, 255, 255, .08);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
+    }
+
+    .admin-stats span,
+    .admin-record span,
+    .admin-empty,
+    .admin-form__hint,
+    .admin-gallery__header small,
+    .admin-gallery__empty {
+      color: rgba(255, 255, 255, .5);
+    }
+
+    .admin-toolbar,
+    .admin-modal__header {
+      border-color: rgba(255, 255, 255, .08);
+    }
+
+    .admin-toolbar select,
+    .admin-search input,
+    .admin-form input,
+    .admin-form select,
+    .admin-form textarea {
+      background: #11161d;
+      color: $white;
+      border-color: rgba(255, 255, 255, .1);
+
+      &::placeholder {
+        color: rgba(255, 255, 255, .35);
+      }
+    }
+
+    .admin-table th {
+      background: rgba(255, 255, 255, .035);
+      color: rgba(255, 255, 255, .48);
+    }
+
+    .admin-table td {
+      border-color: rgba(255, 255, 255, .055);
+    }
+
+    .admin-table tbody tr:hover {
+      background: rgba(255, 255, 255, .025);
+    }
+
+    .admin-actions button,
+    .admin-gallery__row>button,
+    .admin-modal__header>button {
+      background: #252c35;
+      border-color: rgba(255, 255, 255, .08);
+      color: $white;
+
+      &.danger {
+        color: #ff8f8f;
+      }
+    }
+
+    .admin-gallery,
+    .admin-toggle-row {
+      background: rgba(255, 255, 255, .025);
+      border-color: rgba(255, 255, 255, .08);
+    }
+
+    .admin-gallery__empty {
+      background: #11161d;
+    }
+
+    .admin-icon-picker__preview {
+      border-color: rgba(255, 255, 255, .08);
+    }
+
+    .admin-category {
+      color: #dfb979;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .admin-stats-scroll .admin-stats article {
+      flex-basis: 165px;
+    }
+
+    .admin-gallery__header {
+      align-items: stretch;
+      flex-direction: column;
+    }
+  }
 }

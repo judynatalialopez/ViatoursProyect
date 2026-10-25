@@ -1,0 +1,10 @@
+const db=require('../config/db')
+const httpError=require('../utils/httpError')
+const toSlug=require('../utils/slug')
+const map=row=>({...row,active:Boolean(row.active),link:`/catalog?destination=${row.id}`})
+const list=async(req,res)=>{const includeInactive=req.query.all==='1';const[rows]=await db.query(`SELECT id,name,slug,image,active,created_at,updated_at FROM destinations${includeInactive?'':' WHERE active=1'} ORDER BY name`);res.json(rows.map(map))}
+const getOne=async(req,res)=>{const[[row]]=await db.query('SELECT id,name,slug,image,active,created_at,updated_at FROM destinations WHERE id=? LIMIT 1',[req.params.id]);if(!row)throw httpError(404,'Destino no encontrado');res.json(map(row))}
+const create=async(req,res)=>{const name=String(req.body.name||'').trim();const image=String(req.body.image||'').trim();const active=req.body.active===false?0:1;if(!name||!image)throw httpError(400,'Nombre e imagen son obligatorios');const slug=toSlug(name);const[result]=await db.query('INSERT INTO destinations(name,slug,image,active) VALUES(?,?,?,?)',[name,slug,image,active]);req.params.id=result.insertId;return getOne(req,res)}
+const update=async(req,res)=>{const name=String(req.body.name||'').trim();const image=String(req.body.image||'').trim();const active=req.body.active===false?0:1;if(!name||!image)throw httpError(400,'Nombre e imagen son obligatorios');await db.query('UPDATE destinations SET name=?,slug=?,image=?,active=? WHERE id=?',[name,toSlug(name),image,active,req.params.id]);return getOne(req,res)}
+const remove=async(req,res)=>{const[result]=await db.query('DELETE FROM destinations WHERE id=?',[req.params.id]);if(!result.affectedRows)throw httpError(404,'Destino no encontrado');res.status(204).end()}
+module.exports={list,getOne,create,update,remove}
