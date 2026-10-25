@@ -92,7 +92,7 @@
         "./imports"
       ],
       "#app-manifest": [
-        "./manifest/meta/39c4e23b-067f-4920-850d-55ef98096c0d.json"
+        "./manifest/meta/dev.json"
       ],
       "nitropack/types": [
         "../node_modules/nitropack/types.d.ts"
@@ -110,7 +110,7 @@
         "../node_modules/crossws"
       ],
       "#build/server-routes": [
-        "./types/shared-server-routes"
+        "./types/shared-server-routes.d.ts"
       ],
       "#build": [
         "."

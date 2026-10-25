@@ -92,10 +92,10 @@
         "./imports"
       ],
       "#app-manifest": [
-        "./manifest/meta/39c4e23b-067f-4920-850d-55ef98096c0d.json"
+        "./manifest/meta/dev.json"
       ],
       "#components": [
-        "./components.d.ts"
+        "./components"
       ],
       "@nuxt/nitro-server/request-types": [
         "../node_modules/@nuxt/nitro-server/dist/request-types.d.mts"
@@ -235,7 +235,7 @@
     "../node_modules/dist/*.tsx",
     "../node_modules/dist/*.jsx",
     "../node_modules/dist/*.vue",
-    "../.output",
+    "dev",
     "../server"
   ],
   "vueCompilerOptions": {
