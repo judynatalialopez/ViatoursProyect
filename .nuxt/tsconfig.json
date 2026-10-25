@@ -95,7 +95,7 @@
         "./manifest/meta/dev.json"
       ],
       "#components": [
-        "./components"
+        "./components.d.ts"
       ],
       "@nuxt/nitro-server/request-types": [
         "../node_modules/@nuxt/nitro-server/dist/request-types.d.mts"
