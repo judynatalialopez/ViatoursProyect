@@ -658,7 +658,7 @@ const _inlineRuntimeConfig = {
       }
     }
   },
-  "appSecret": "d436a62988bdc9416c1dea2a6693e93697c66bb6d96cd90bb43e801403d4388b",
+  "appSecret": "94ad455a291035769f9c0619b25bd1a72b08533c0594d6fb295c9f5f50d52aa4",
   "public": {
     "apiBase": "http://localhost:4000/api"
   }
