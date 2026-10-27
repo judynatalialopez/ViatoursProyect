@@ -761,7 +761,7 @@ const uploadImage = async (event: Event, onDone: (url: string) => void, key: str
             <label class="admin-form__wide">
             <span>Imagen de portada</span>
             <div style="display:flex; gap:8px">
-              <input v-model="placeForm.image" required type="url" placeholder="https://..." style="flex:1">
+              <input v-model="placeForm.image" required type="url" readonly placeholder="Sube una imagen..." style="flex:1">
               <label class="admin-btn-secondary" style="cursor:pointer; white-space:nowrap">
                 <i class="fa-light fa-arrow-up-from-bracket"></i>
                 {{ uploading === 'cover' ? 'SUBIENDO...' : 'SUBIR' }}
@@ -787,7 +787,7 @@ const uploadImage = async (event: Event, onDone: (url: string) => void, key: str
               <div v-if="placeForm.gallery?.length" class="admin-gallery__list">
                 <div v-for="(_, index) in placeForm.gallery" :key="index" class="admin-gallery__row">
                   <span>{{ index + 2 }}</span>
-                  <input v-model="placeForm.gallery[index]" type="url" :placeholder="`URL imagen ${index + 2}`">
+                  <input v-model="placeForm.gallery[index]" type="url" readonly :placeholder="`Sube la imagen ${index + 2}`">
 
                   <label class="admin-gallery__action" title="Subir desde el computador">
                     <i :class="uploading === `gallery-${index}` ? 'fa-light fa-spinner fa-spin' : 'fa-light fa-arrow-up-from-bracket'"></i>
@@ -814,7 +814,7 @@ const uploadImage = async (event: Event, onDone: (url: string) => void, key: str
             <label class="admin-form__wide">
               <span>Imagen</span>
               <div style="display:flex; gap:8px">
-                <input v-model="destinationForm.image" required type="url" placeholder="https://..." style="flex:1">
+                <input v-model="destinationForm.image" required type="url" readonly placeholder="Sube una imagen...">
                 <label class="admin-btn-secondary" style="cursor:pointer; white-space:nowrap">
                   <i class="fa-light fa-arrow-up-from-bracket"></i>
                   {{ uploading === 'dest' ? 'SUBIENDO...' : 'SUBIR' }}
