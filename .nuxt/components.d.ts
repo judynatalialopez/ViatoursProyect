@@ -14,6 +14,7 @@ type HydrationStrategies = {
 type LazyComponent<T> = DefineComponent<HydrationStrategies, {}, {}, {}, {}, {}, {}, { hydrated: () => void }> & T
 
 
+export const CampoImagen: typeof import("../app/components/CampoImagen.vue")['default']
 export const ButtonChange: typeof import("../app/components/button-change.vue")['default']
 export const ButtonLink: typeof import("../app/components/button-link.vue")['default']
 /**
@@ -110,6 +111,7 @@ export const Body: typeof import("../node_modules/nuxt/dist/head/runtime/compone
  * @see https://nuxt.com/docs/4.x/api/components/nuxt-island
  */
 export const NuxtIsland: typeof import("../node_modules/nuxt/dist/app/components/nuxt-island")['default']
+export const LazyCampoImagen: LazyComponent<typeof import("../app/components/CampoImagen.vue")['default']>
 export const LazyButtonChange: LazyComponent<typeof import("../app/components/button-change.vue")['default']>
 export const LazyButtonLink: LazyComponent<typeof import("../app/components/button-link.vue")['default']>
 /**

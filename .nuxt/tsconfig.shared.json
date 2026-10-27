@@ -92,7 +92,7 @@
         "./imports"
       ],
       "#app-manifest": [
-        "./manifest/meta/32e56b83-ad2b-44e6-8fea-06a473d1e342.json"
+        "./manifest/meta/dev.json"
       ],
       "nitropack/types": [
         "../node_modules/nitropack/types.d.ts"

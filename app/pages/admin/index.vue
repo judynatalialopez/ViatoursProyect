@@ -359,6 +359,32 @@ const logout = async () => {
     await navigateTo('/admin/login')
   }
 }
+
+const uploading = ref<string>('') // guarda qué campo está subiendo: 'cover', 'dest' o 'gallery-0'
+
+const uploadImage = async (event: Event, onDone: (url: string) => void, key: string) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    error.value = 'Selecciona un archivo de imagen.'
+    input.value = ''
+    return
+  }
+
+  uploading.value = key
+  error.value = ''
+  try {
+    const url = await useSubirImagen(file)
+    onDone(url)
+  } catch (e: any) {
+    error.value = e?.message || 'No se pudo subir la imagen.'
+  } finally {
+    uploading.value = ''
+    input.value = '' // permite volver a elegir el mismo archivo
+  }
+}
 </script>
 
 <template>
@@ -733,10 +759,18 @@ const logout = async () => {
             </label>
 
             <label class="admin-form__wide">
-              <span>Imagen de portada</span>
-              <input v-model="placeForm.image" required type="url" placeholder="https://...">
-              <small class="admin-form__hint">La portada también se incluirá como primera imagen del slider.</small>
-            </label>
+            <span>Imagen de portada</span>
+            <div style="display:flex; gap:8px">
+              <input v-model="placeForm.image" required type="url" placeholder="https://..." style="flex:1">
+              <label class="admin-btn-secondary" style="cursor:pointer; white-space:nowrap">
+                <i class="fa-light fa-arrow-up-from-bracket"></i>
+                {{ uploading === 'cover' ? 'SUBIENDO...' : 'SUBIR' }}
+                <input type="file" accept="image/*" hidden :disabled="!!uploading"
+                  @change="uploadImage($event, url => placeForm.image = url, 'cover')">
+              </label>
+            </div>
+            <small class="admin-form__hint">La portada también se incluirá como primera imagen del slider.</small>
+          </label>
 
             <div class="admin-gallery admin-form__wide">
               <div class="admin-gallery__header">
@@ -754,7 +788,15 @@ const logout = async () => {
                 <div v-for="(_, index) in placeForm.gallery" :key="index" class="admin-gallery__row">
                   <span>{{ index + 2 }}</span>
                   <input v-model="placeForm.gallery[index]" type="url" :placeholder="`URL imagen ${index + 2}`">
-                  <button type="button" title="Quitar imagen" @click="removeGalleryImage(index)">
+
+                  <label class="admin-gallery__action" title="Subir desde el computador">
+                    <i :class="uploading === `gallery-${index}` ? 'fa-light fa-spinner fa-spin' : 'fa-light fa-arrow-up-from-bracket'"></i>
+                    <input type="file" accept="image/*" hidden :disabled="!!uploading"
+                      @change="uploadImage($event, url => placeForm.gallery![index] = url, `gallery-${index}`)">
+                  </label>
+
+                  <button type="button" class="admin-gallery__action admin-gallery__action--danger" title="Quitar imagen"
+                    @click="removeGalleryImage(index)">
                     <i class="fa-light fa-trash"></i>
                   </button>
                 </div>
@@ -770,8 +812,16 @@ const logout = async () => {
             </label>
 
             <label class="admin-form__wide">
-              <span>URL de imagen</span>
-              <input v-model="destinationForm.image" required type="url">
+              <span>Imagen</span>
+              <div style="display:flex; gap:8px">
+                <input v-model="destinationForm.image" required type="url" placeholder="https://..." style="flex:1">
+                <label class="admin-btn-secondary" style="cursor:pointer; white-space:nowrap">
+                  <i class="fa-light fa-arrow-up-from-bracket"></i>
+                  {{ uploading === 'dest' ? 'SUBIENDO...' : 'SUBIR' }}
+                  <input type="file" accept="image/*" hidden :disabled="!!uploading"
+                    @change="uploadImage($event, url => destinationForm.image = url, 'dest')">
+                </label>
+              </div>
             </label>
 
             <label class="admin-form__wide">

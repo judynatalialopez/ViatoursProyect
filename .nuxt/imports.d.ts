@@ -35,3 +35,5 @@ export { setInterval } from '#app/compat/interval';
 export { definePageMeta, PageMeta } from '#app/composables/pages';
 export { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
 export { useApi, Destination, Category, CatalogPlace } from '../app/composables/useAdminData';
+export { useSubirImagen } from '../app/composables/useSubirImagen';
+export { useNuxtDevTools } from '../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';
