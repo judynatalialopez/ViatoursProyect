@@ -13,7 +13,7 @@ async function onFile(e) {
   cargando.value = true;
   error.value = "";
   try {
-    const url = await useSubirImagen(file); // auto-importado
+    const url = await useSubirImagen(file); 
     emit("update:modelValue", url);
   } catch (err) {
     error.value = err.message;
