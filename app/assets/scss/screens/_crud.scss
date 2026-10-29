@@ -738,15 +738,56 @@
   }
 }
 
+.admin-table__icon {
+  vertical-align: middle;
+}
+
 .admin-category-icon {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
+  width: 28px;
+  height: 28px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   border-radius: 50%;
-  background: rgba(198, 163, 107, .12);
-  color: $golden;
-  font-size: 14px;
+
+  background: rgba(198, 163, 107, 0.12);
+
+  vertical-align: middle;
+
+  overflow: hidden;
+
+  i {
+    width: 18px;
+    height: 18px;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 14px;
+    line-height: 18px !important;
+
+    text-align: center;
+
+    color: oklch(72% 0.09 78deg);
+
+    &::before {
+      width: 18px;
+
+      display: block;
+
+      margin: 0 auto;
+
+      line-height: 18px !important;
+
+      text-align: center;
+    }
+  }
 }
 
 .admin-form__hint {

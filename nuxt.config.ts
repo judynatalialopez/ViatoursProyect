@@ -1,1 +1,24 @@
-export default defineNuxtConfig({ compatibilityDate: '2025-07-15', devtools: { enabled: true }, css: ['~/assets/scss/main.scss'], runtimeConfig: { public: { apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:4000/api' } }, app: { head: { htmlAttrs: { lang: 'es' }, title: 'Viatours', meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }], link: [{ rel: 'icon', type: 'image/png', href: '/img/icon-logo.png' }, { rel: 'stylesheet', href: '/css/fontawesome.css' }, { rel: 'preconnect', href: 'https://fonts.googleapis.com' }, { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }, { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap' }] } } })
+export default defineNuxtConfig({
+  compatibilityDate: '2025-07-15',
+  devtools: { enabled: true },
+  css: ['~/assets/scss/main.scss', '@fortawesome/fontawesome-free/css/all.min.css'],
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:4000/api'
+    }
+  },
+  app: {
+    head: {
+      htmlAttrs: { lang: 'es' },
+      title: 'Viatours',
+      meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+      link: [
+        { rel: 'icon', type: 'image/png', href: '/img/icon-logo.png' },
+        { rel: 'stylesheet', href: '/css/fontawesome.css' },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap' }
+      ]
+    }
+  }
+}) 
