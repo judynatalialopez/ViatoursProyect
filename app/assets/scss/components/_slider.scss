@@ -1,6 +1,7 @@
 @use "../variables" as *;
 
 .container-slider {
+
   .gallery-heading {
     display: flex;
     align-items: center;
@@ -127,10 +128,8 @@
 
     h4 {
       margin: 0 0 7px;
-
       font-size: 15px;
       line-height: 1.2;
-
       color: #c99952;
     }
 
@@ -166,77 +165,8 @@
     }
   }
 
-  .swiper-button-prev,
-  .swiper-button-next {
-    width: 44px;
-    height: 44px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: white;
-
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 50%;
-
-    background: rgba(18, 22, 28, 0.85);
-
-    backdrop-filter: blur(8px);
-
-    z-index: 3;
-
-    transition:
-      background 0.3s ease,
-      transform 0.3s ease;
-
-    &::after {
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    &:hover {
-      background: #12161c;
-      transform: scale(1.05);
-    }
-  }
-
-  .swiper-button-prev {
-    left: 18px;
-  }
-
-  .swiper-button-next {
-    right: 18px;
-  }
-
-  .swiper-pagination {
-    bottom: 5px;
-  }
-
-  .swiper-pagination-bullet {
-    width: 8px;
-    height: 8px;
-
-    background: transparent;
-
-    border: 1px solid #c99952;
-
-    opacity: 1;
-
-    transition:
-      width 0.3s ease,
-      background 0.3s ease;
-  }
-
-  .swiper-pagination-bullet-active {
-    width: 24px;
-
-    border-radius: 10px;
-
-    background: #c99952;
-  }
-
   @media (max-width: 991px) {
+
     .slider-gallery {
       overflow: hidden;
     }
@@ -262,6 +192,7 @@
   }
 
   @media (max-width: 767px) {
+
     .gallery-heading {
       gap: 15px;
       margin-bottom: 20px;
@@ -364,6 +295,104 @@
         background: rgba(18, 22, 28, 0.7);
       }
     }
+  }
+}
+
+
+/* =========================================================
+   SWIPER COMPARTIDO
+   Funciona tanto en .container-slider como en .noteworthy
+   ========================================================= */
+
+.slider-gallery {
+  width: 100%;
+  position: relative;
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+
+    background: rgba(18, 22, 28, 0.85);
+
+    backdrop-filter: blur(8px);
+
+    z-index: 10;
+
+    transition:
+      background 0.3s ease,
+      transform 0.3s ease;
+
+    &::after {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    &:hover {
+      background: #12161c;
+      transform: scale(1.05);
+    }
+  }
+
+  .swiper-button-prev {
+    left: 18px;
+  }
+
+  .swiper-button-next {
+    right: 18px;
+  }
+
+  .swiper-pagination {
+    bottom: 5px;
+  }
+
+  .swiper-pagination-bullet {
+    width: 8px;
+    height: 8px;
+
+    background: transparent;
+
+    border: 1px solid #c99952;
+
+    opacity: 1;
+
+    transition:
+      width 0.3s ease,
+      background 0.3s ease;
+  }
+
+  .swiper-pagination-bullet-active {
+    width: 24px;
+
+    border-radius: 10px;
+
+    background: #c99952;
+  }
+}
+
+.swiper-button-prev svg,
+.swiper-button-next svg {
+  width: initial !important;
+  height: initial !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE SWIPER COMPARTIDO
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+  .slider-gallery {
 
     .swiper-button-prev,
     .swiper-button-next {
@@ -385,11 +414,10 @@
   }
 }
 
-.swiper-button-prev svg,
-.swiper-button-next svg {
-  width: initial !important;
-  height: initial !important;
-}
+
+/* =========================================================
+   MODAL GALERÍA
+   ========================================================= */
 
 .gallery-modal {
   position: fixed;
@@ -499,6 +527,7 @@
 
 .gallery-modal-arrow {
   position: absolute;
+
   top: 50%;
 
   z-index: 10;
@@ -550,7 +579,9 @@
   opacity: 0;
 }
 
+
 @media (max-width: 991px) {
+
   .gallery-modal {
     padding: 50px 55px;
   }
@@ -564,13 +595,16 @@
   }
 
   .gallery-modal-image {
+
     img {
       max-height: 80vh;
     }
   }
 }
 
+
 @media (max-width: 767px) {
+
   .gallery-modal {
     padding: 70px 15px 25px;
   }
@@ -590,6 +624,7 @@
   }
 
   .gallery-modal-image {
+
     img {
       max-height: 75vh;
       border-radius: 8px;
@@ -609,5 +644,21 @@
 
   .gallery-modal-next {
     right: 8px;
+  }
+}
+
+.slider-gallery {
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    &.swiper-button-lock {
+      display: none !important;
+    }
+  }
+
+  .swiper-pagination {
+    &.swiper-pagination-lock {
+      display: none !important;
+    }
   }
 }

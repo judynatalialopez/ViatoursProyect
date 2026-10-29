@@ -1,24 +1,36 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+
 import { useApi } from '~/composables/useAdminData'
 import type { CatalogPlace, Category, Destination } from '~/composables/useAdminData'
 
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+
 const route = useRoute()
 const { request } = useApi()
+
 const destinationId = computed(() => Number(route.query.destination) || 1)
 const activeTag = ref<number | null>(null)
 const search = ref('')
 const sortBy = ref('')
 
+const modules = [Navigation, Pagination, Autoplay]
+
 const { data: destination, refresh: refreshDestination } = await useAsyncData(
   () => `destination-${destinationId.value}`,
   () => request<Destination>(`/destinations/${destinationId.value}`),
 )
+
 const { data: categories, refresh: refreshCategories } = await useAsyncData(
   'public-categories',
   () => request<Category[]>('/categories'),
   { default: () => [] },
 )
+
 const { data: places, refresh: refreshPlaces } = await useAsyncData(
   () => `places-${destinationId.value}`,
   () => request<CatalogPlace[]>(`/places?destinationId=${destinationId.value}`),
@@ -30,7 +42,6 @@ useCatalogLive(() => {
   refreshCategories()
   refreshPlaces()
 })
-
 
 const categoryCount = (categoryId: number | null) =>
   categoryId === null
@@ -166,35 +177,68 @@ const regularPlaces = computed(() =>
       </form>
 
       <div class="col-grid">
-        <div class="noteworthy">
+
+        <div v-if="agreementPlaces.length" class="noteworthy">
           <h2>Destacado</h2>
-          <div v-if="agreementPlaces.length" class="container-grid-catalog agreement">
-            <a v-for="place in agreementPlaces" :key="place.id" :href="place.url" class="item">
-              <div class="img">
-                <img :src="place.image" :alt="place.name">
-              </div>
 
-              <div class="text">
-                <div class="top">
-                  <h3>{{ place.name }}</h3>
-                  <p>{{ place.description }}</p>
+          <Swiper class="container-grid-catalog slider-gallery agreement" :modules="modules" :slides-per-view="1.15"
+            :space-between="12" :watch-overflow="true" :navigation="agreementPlaces.length > 1" :pagination="{
+              clickable: true
+            }" :autoplay="agreementPlaces.length > 3
+              ? {
+                delay: 6000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true
+              }
+              : false
+              " :breakpoints="{
+                768: {
+                  slidesPerView: 2.15,
+                  spaceBetween: 16
+                },
+                992: {
+                  slidesPerView: agreementPlaces.length === 2 ? 2 : 3,
+                  spaceBetween: 20
+                }
+              }">
+            <SwiperSlide v-for="place in agreementPlaces" :key="place.id" class="agreement-item">
+              <a :href="place.url" class="item">
+                <div class="card-inner">
+
+                  <div class="img card-face card-front">
+                    <div class="circle">
+                      <i class="fa-regular fa-star"></i>
+                    </div>
+
+                    <img :src="place.image" :alt="place.name">
+
+                    <h3>{{ place.name }}</h3>
+                  </div>
+
+                  <div class="text card-face card-back">
+                    <div class="top">
+                      <h3>{{ place.name }}</h3>
+                      <p>{{ place.description }}</p>
+                    </div>
+
+                    <div class="bottom">
+                      <p v-if="place.phone">
+                        <i class="fa-solid fa-phone"></i>
+                        {{ place.phone }}
+                      </p>
+
+                      <p v-else>
+                        <i class="fa-solid fa-phone-slash"></i>
+                      </p>
+
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+
                 </div>
-
-                <div class="bottom">
-                  <p v-if="place.phone">
-                    <i class="fa-solid fa-phone"></i>
-                    {{ place.phone }}
-                  </p>
-
-                  <p v-else>
-                    <i class="fa-solid fa-phone-slash"></i>
-                  </p>
-
-                  <i class="fa-solid fa-chevron-right"></i>
-                </div>
-              </div>
-            </a>
-          </div>
+              </a>
+            </SwiperSlide>
+          </Swiper>
         </div>
 
         <div class="container-grid-catalog">
@@ -232,6 +276,7 @@ const regularPlaces = computed(() =>
             <p>No encontramos resultados.</p>
           </div>
         </div>
+
       </div>
     </div>
   </section>

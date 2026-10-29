@@ -36,10 +36,11 @@ section.catalog {
 
                 &:hover {
                     transform: translateY(-5px);
-                    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12) !important;
+                    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 
                     .img {
                         img {
+                            pointer-events: none;
                             transform: scale(1.05);
                         }
                     }
@@ -263,6 +264,151 @@ section.internal {
                 background: oklch(72% 0.09 78deg);
                 top: initial;
                 transition: background-color 700ms ease;
+            }
+        }
+    }
+}
+
+.noteworthy {
+    margin-top: 80px;
+
+    h2 {
+        font-size: 52px;
+        font-family: "Newsreader 16pt", sans-serif;
+        line-height: 95%;
+        font-weight: 100;
+        text-align: center;
+        transition: all 400ms ease;
+        color: $blue;
+    }
+
+    .container-grid-catalog.slider-gallery.agreement {
+        margin: 30px 0 !important;
+        padding-bottom: 45px;
+
+        .swiper-wrapper {
+            align-items: stretch;
+        }
+
+        .agreement-item {
+            height: auto;
+            display: flex;
+
+            .item {
+                width: 100%;
+                height: 220px;
+                background-color: transparent !important;
+                position: relative;
+                perspective: 1200px;
+                overflow: visible !important;
+                box-shadow: 0 12px 30px rgb(255 255 255 / 12%) !important;
+                display: block;
+
+                .circle {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 100%;
+                    position: absolute;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    top: 10px;
+                    left: 10px;
+                    background: #c49d62;
+                    color: black;
+                    z-index: 3;
+                }
+
+                .card-inner {
+                    width: 100%;
+                    height: 100%;
+                    position: relative;
+                    transform-style: preserve-3d;
+                    transition: transform 700ms ease;
+                }
+
+                &:hover {
+                    transform: none !important;
+                    box-shadow: 0 12px 30px rgb(255 255 255 / 12%) !important;
+
+                    .card-inner {
+                        transform: rotateY(180deg);
+                    }
+
+                    .img {
+                        img {
+                            transform: none !important;
+                        }
+                    }
+
+                    .text {
+                        .bottom {
+                            >i.fa-solid.fa-chevron-right {
+                                transform: none !important;
+                            }
+                        }
+                    }
+                }
+
+                .card-face {
+                    position: absolute !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    top: 0;
+                    left: 0;
+                    backface-visibility: hidden;
+                    -webkit-backface-visibility: hidden;
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+
+                .img {
+                    transform: rotateY(0deg);
+
+                    h3 {
+                        width: 100%;
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        color: white;
+                        background: #12161ca8;
+                        padding: 12px;
+                        margin: 0;
+                        z-index: 2;
+                    }
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        display: block;
+                    }
+                }
+
+                .text {
+                    transform: rotateY(180deg);
+                    background: $black;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+
+                    h3 {
+                        font-family: $archivo !important;
+                        color: $golden !important;
+                        margin-bottom: 19px !important;
+                    }
+
+                    p {
+                        color: $white !important;
+                    }
+
+                    .bottom {
+                        >i.fa-solid.fa-chevron-right {
+                            color: $white !important;
+                        }
+                    }
+                }
             }
         }
     }
