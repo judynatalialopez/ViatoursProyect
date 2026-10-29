@@ -8,3 +8,6 @@ const create=async(req,res)=>{const name=String(req.body.name||'').trim();const 
 const update=async(req,res)=>{const name=String(req.body.name||'').trim();const image=String(req.body.image||'').trim();const active=req.body.active===false?0:1;if(!name||!image)throw httpError(400,'Nombre e imagen son obligatorios');await db.query('UPDATE destinations SET name=?,slug=?,image=?,active=? WHERE id=?',[name,toSlug(name),image,active,req.params.id]);return getOne(req,res)}
 const remove=async(req,res)=>{const[result]=await db.query('DELETE FROM destinations WHERE id=?',[req.params.id]);if(!result.affectedRows)throw httpError(404,'Destino no encontrado');res.status(204).end()}
 module.exports={list,getOne,create,update,remove}
+broadcast('destination', 'created', result.insertId)
+broadcast('destination', 'updated', Number(req.params.id))
+broadcast('destination', 'deleted', Number(req.params.id))

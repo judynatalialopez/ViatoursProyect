@@ -5,32 +5,32 @@ import type { CatalogPlace, Category, Destination } from '~/composables/useAdmin
 
 const route = useRoute()
 const { request } = useApi()
-
 const destinationId = computed(() => Number(route.query.destination) || 1)
 const activeTag = ref<number | null>(null)
 const search = ref('')
 const sortBy = ref('')
 
-const { data: destination } = await useAsyncData(
+const { data: destination, refresh: refreshDestination } = await useAsyncData(
   () => `destination-${destinationId.value}`,
-  () => request<Destination>(`/destinations/${destinationId.value}`)
+  () => request<Destination>(`/destinations/${destinationId.value}`),
 )
-
-const { data: categories } = await useAsyncData(
+const { data: categories, refresh: refreshCategories } = await useAsyncData(
   'public-categories',
   () => request<Category[]>('/categories'),
-  {
-    default: () => []
-  }
+  { default: () => [] },
 )
-
-const { data: places } = await useAsyncData(
+const { data: places, refresh: refreshPlaces } = await useAsyncData(
   () => `places-${destinationId.value}`,
   () => request<CatalogPlace[]>(`/places?destinationId=${destinationId.value}`),
-  {
-    default: () => []
-  }
+  { default: () => [] },
 )
+
+useCatalogLive(() => {
+  refreshDestination()
+  refreshCategories()
+  refreshPlaces()
+})
+
 
 const categoryCount = (categoryId: number | null) =>
   categoryId === null
