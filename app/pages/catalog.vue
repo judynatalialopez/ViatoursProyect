@@ -179,7 +179,7 @@ const regularPlaces = computed(() =>
       <div class="col-grid">
 
         <div v-if="agreementPlaces.length" class="noteworthy">
-          <h2>Destacado</h2>
+          <h2>CONVENIOS</h2>
 
           <Swiper class="container-grid-catalog slider-gallery agreement" :modules="modules" :slides-per-view="1.15"
             :space-between="12" :watch-overflow="true" :navigation="agreementPlaces.length > 1" :pagination="{
