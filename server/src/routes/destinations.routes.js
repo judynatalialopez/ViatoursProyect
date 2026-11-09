@@ -1,0 +1,10 @@
+const router=require('express').Router()
+const auth=require('../middleware/auth')
+const asyncHandler=require('../utils/asyncHandler')
+const controller=require('../controllers/destinations.controller')
+router.get('/',asyncHandler(controller.list))
+router.get('/:id',asyncHandler(controller.getOne))
+router.post('/',auth,asyncHandler(controller.create))
+router.put('/:id',auth,asyncHandler(controller.update))
+router.delete('/:id',auth,asyncHandler(controller.remove))
+module.exports=router

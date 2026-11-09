@@ -1,0 +1,17 @@
+@use "reset";
+@use "typography";
+
+@use "components/button";
+@use "components/common";
+@use "components/form";
+@use "components/animation";
+@use "components/slider";
+
+@use "screens/home";
+@use "screens/destination";
+@use "screens/catalog";
+
+@use "screens/login";
+@use "screens/crud";
+
+@use "components/dark";
