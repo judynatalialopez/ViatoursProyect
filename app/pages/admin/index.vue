@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch} from 'vue'
 
 import { useAdminData } from '~/composables/useAdminData'
+
 
 import type {
   CatalogPlace,
@@ -19,8 +20,9 @@ const {
   request,
 } = useAdminData()
 
+
 const activeSection = ref<
-  'places' | 'destinations' | 'categories'
+  'places' | 'destinations' | 'categories' | 'dashboard'
 >('places')
 
 const search = ref('')
@@ -384,7 +386,8 @@ const setSection = (
   section:
     | 'places'
     | 'destinations'
-    | 'categories',
+    | 'categories'
+    | 'dashboard'
 ) => {
   activeSection.value =
     section
@@ -867,6 +870,495 @@ const uploadImage = async (
     input.value = ''
   }
 }
+
+/**
+ * DASHBOARD
+ */
+type RankingRow = {
+  id: number
+  name: string
+  category: string
+  views: number
+  clicks: number
+  uniques: number
+}
+
+type StatsResponse = {
+  ranking: RankingRow[]
+  daily: { day: string; views: number }[]
+  devices: { device: string; total: number }[]
+}
+
+type PlaceReport = {
+  place: { id: number; name: string; category: string }
+  from: string
+  to: string
+  totals: { views: number; clicks: number; uniques: number }
+  daily: { day: string; views: number; clicks: number }[]
+  devices: { device: string; total: number }[]
+}
+
+const pad = (n: number) => String(n).padStart(2, '0')
+
+const isAgreement = (place: { categoryName?: string }) =>
+  place.categoryName?.trim().toLowerCase() === 'convenio'
+
+const now = new Date()
+const month = ref(`${now.getFullYear()}-${pad(now.getMonth() + 1)}`)
+
+const parts = month.value.split('-')
+
+if (parts.length < 2) {
+  throw new Error('Mes inválido')
+}
+
+const range = computed(() => {
+  const [y, m] = month.value
+    .split('-')
+    .map(Number) as [number, number]
+
+  const days = new Date(y, m, 0).getDate()
+
+  return {
+    from: `${y}-${pad(m)}-01`,
+    to: `${y}-${pad(m)}-${pad(days)}`,
+    days,
+  }
+})
+
+const monthLabel = computed(() => {
+  const [y, m] = month.value
+    .split('-')
+    .map(Number) as [number, number]
+
+  return new Intl.DateTimeFormat('es-CO', {
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(y, m - 1, 1))
+})
+
+const statsData = ref<StatsResponse>({ ranking: [], daily: [], devices: [] })
+const statsLoading = ref(false)
+
+const loadStats = async () => {
+  statsLoading.value = true
+  try {
+    statsData.value = await request<StatsResponse>(
+      `/analytics/stats?from=${range.value.from}&to=${range.value.to}`,
+    )
+  } catch {
+    error.value = 'No fue posible cargar las estadísticas.'
+  } finally {
+    statsLoading.value = false
+  }
+}
+
+watch([activeSection, month], ([section]) => {
+  if (section === 'dashboard') loadStats()
+})
+
+/* Tarjetas */
+const totalPlaces = computed(() => places.value.length)
+const agreementCount = computed(() => places.value.filter(isAgreement).length)
+const totalViews = computed(() =>
+  statsData.value.ranking.reduce((sum, r) => sum + r.views, 0),
+)
+
+/* Tabla */
+const dashSearch = ref('')
+const dashPageSize = ref(5)
+const dashPage = ref(1)
+const dashSort = ref<{ key: 'name' | 'category' | 'views'; dir: 'asc' | 'desc' }>({
+  key: 'views',
+  dir: 'desc',
+})
+
+const toggleDashSort = (key: 'name' | 'category' | 'views') => {
+  dashSort.value =
+    dashSort.value.key === key
+      ? { key, dir: dashSort.value.dir === 'asc' ? 'desc' : 'asc' }
+      : { key, dir: key === 'views' ? 'desc' : 'asc' }
+}
+
+const dashboardRows = computed(() => {
+  const byId = new Map(statsData.value.ranking.map(r => [r.id, r]))
+
+  const term = dashSearch.value.trim().toLowerCase()
+
+  const rows = places.value
+    .filter(isAgreement) // 👈 solo lugares con convenio
+    .map(place => ({
+      id: place.id,
+      name: place.name,
+      image: place.image,
+      category: place.categoryName,
+      views: byId.get(place.id)?.views || 0,
+    }))
+    .filter(r =>
+      !term ||
+      r.name.toLowerCase().includes(term) ||
+      (r.category || '').toLowerCase().includes(term),
+    )
+
+  const { key, dir } = dashSort.value
+  const factor = dir === 'asc' ? 1 : -1
+
+  return rows.sort((a, b) =>
+    key === 'views'
+      ? (a.views - b.views) * factor
+      : String(a[key] || '').localeCompare(String(b[key] || ''), 'es') * factor,
+  )
+})
+
+const dashTotalPages = computed(() =>
+  Math.max(1, Math.ceil(dashboardRows.value.length / dashPageSize.value)),
+)
+
+const pagedRows = computed(() => {
+  const start = (dashPage.value - 1) * dashPageSize.value
+  return dashboardRows.value.slice(start, start + dashPageSize.value)
+})
+
+/* Paginación con "…" */
+const pageButtons = computed<(number | '…')[]>(() => {
+  const total = dashTotalPages.value
+  const current = dashPage.value
+  if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1)
+  if (current <= 3) return [1, 2, 3, '…', total]
+  if (current >= total - 2) return [1, '…', total - 2, total - 1, total]
+  return [1, '…', current, '…', total]
+})
+
+watch([dashSearch, dashPageSize, month], () => {
+  dashPage.value = 1
+})
+
+/* Top 5 */
+const topPlaces = computed(() =>
+  [...statsData.value.ranking]
+    .filter(r => r.views > 0)
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 5),
+)
+const topMax = computed(() => Math.max(1, ...topPlaces.value.map(p => p.views)))
+
+/* Gráfica */
+const dailySeries = computed(() => {
+  const map = new Map(statsData.value.daily.map(d => [d.day, d.views]))
+  return Array.from({ length: range.value.days }, (_, i) => ({
+    day: i + 1,
+    views: map.get(`${month.value}-${pad(i + 1)}`) || 0,
+  }))
+})
+const dailyMax = computed(() => Math.max(1, ...dailySeries.value.map(d => d.views)))
+
+const chartBar = (views: number, index: number) => {
+  const width = 600 / dailySeries.value.length
+  const height = (views / dailyMax.value) * 150
+  return {
+    x: index * width + 2,
+    y: 160 - height,
+    width: Math.max(width - 4, 1),
+    height,
+  }
+}
+
+/* PDF */
+const pdfBusy = ref<number | 'all' | null>(null)
+
+const loadPdfLibs = async () => {
+  const { jsPDF } = await import('jspdf')
+  const mod: any = await import('jspdf-autotable')
+  return { jsPDF, autoTable: mod.default ?? mod.autoTable }
+}
+
+const slugify = (text: string) =>
+  text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+
+const LOGO_URL = '/img/logo-agl.png' // 👈 ajusta a la ruta real de tu logo
+
+/* Descarga una imagen y la recorta tipo object-fit: cover */
+const loadCoverImage = (url: string, w: number, h: number) =>
+  new Promise<string | null>((resolve) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const scale = 4
+      const canvas = document.createElement('canvas')
+      canvas.width = w * scale
+      canvas.height = h * scale
+      const ctx = canvas.getContext('2d')!
+      const ratio = Math.max(canvas.width / img.width, canvas.height / img.height)
+      const dw = img.width * ratio
+      const dh = img.height * ratio
+      ctx.drawImage(img, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh)
+      resolve(canvas.toDataURL('image/jpeg', 0.9))
+    }
+    img.onerror = () => resolve(null)
+    img.src = url
+  })
+
+const loadLogo = (url: string) =>
+  new Promise<{ data: string; ratio: number } | null>((resolve) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      canvas.getContext('2d')!.drawImage(img, 0, 0)
+      resolve({ data: canvas.toDataURL('image/png'), ratio: img.width / img.height })
+    }
+    img.onerror = () => resolve(null)
+    img.src = url
+  })
+
+const capitalize = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
+
+const monthName = (key: string) => {
+  const [y, m] = key.split('-').map(Number) as [number, number]
+  return capitalize(
+    new Intl.DateTimeFormat('es-CO', { month: 'long' }).format(new Date(y, m - 1, 1)),
+  )
+}
+
+const downloadPlacePdf = async (row: { id: number; name: string }) => {
+  pdfBusy.value = row.id
+  error.value = ''
+
+  try {
+    const place = places.value.find(p => p.id === row.id)
+    const destination = destinations.value.find(d => d.id === place?.destinationId)
+
+    const today = new Date()
+    const todayISO = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`
+
+    // Histórico completo para calcular todas las métricas
+    const report = await request<PlaceReport>(
+      `/analytics/place/${row.id}?from=2000-01-01&to=${todayISO}`,
+    )
+
+    /* ---- Métricas ---- */
+    const byMonth = new Map<string, number>()
+    for (const d of report.daily) {
+      const key = d.day.slice(0, 7)
+      byMonth.set(key, (byMonth.get(key) || 0) + d.views)
+    }
+
+    const totalVisits = report.totals.views
+    const thisMonthVisits = byMonth.get(month.value) || 0
+
+    const [y, m] = month.value.split('-').map(Number) as [number, number]
+    const prev = new Date(y, m - 2, 1)
+    const prevKey = `${prev.getFullYear()}-${pad(prev.getMonth() + 1)}`
+    const prevVisits = byMonth.get(prevKey) || 0
+
+    const variation = prevVisits > 0
+      ? Math.round(((thisMonthVisits - prevVisits) / prevVisits) * 100)
+      : null
+
+    let bestKey = ''
+    let bestVisits = 0
+    byMonth.forEach((v, k) => {
+      if (v > bestVisits) { bestVisits = v; bestKey = k }
+    })
+
+    const ranked = [...statsData.value.ranking].sort((a, b) => b.views - a.views)
+    const rankIndex = ranked.findIndex(r => r.id === row.id)
+    const position = rankIndex >= 0 && ranked[rankIndex]!.views > 0
+      ? `#${rankIndex + 1}`
+      : '—'
+
+    const fmt = (n: number) => n.toLocaleString('es-CO')
+
+    /* ---- Recursos ---- */
+    const [{ jsPDF, autoTable }, logo, cover] = await Promise.all([
+      loadPdfLibs(),
+      loadLogo(LOGO_URL),
+      place?.image ? loadCoverImage(place.image, 182, 48) : Promise.resolve(null),
+    ])
+
+    const doc = new jsPDF()
+    const L = 14
+    const W = 182
+    const GREEN: [number, number, number] = [47, 93, 58]
+    const SOFT: [number, number, number] = [232, 238, 231]
+    const BEIGE: [number, number, number] = [243, 239, 231]
+    const DARK: [number, number, number] = [18, 22, 28]
+
+    let y0 = 12
+
+    /* Logo */
+    if (logo) {
+      const h = 22
+      const w = h * logo.ratio
+      doc.addImage(logo.data, 'PNG', (210 - w) / 2, y0, w, h)
+    }
+    y0 += 28
+
+    doc.setDrawColor(...GREEN)
+    doc.setLineWidth(0.6)
+    doc.line(L, y0, L + W, y0)
+
+    /* Título */
+    y0 += 14
+    doc.setFont('times', 'bold')
+    doc.setFontSize(24)
+    doc.setTextColor(...DARK)
+    doc.text(row.name, 105, y0, { align: 'center' })
+
+    /* Imagen */
+    y0 += 8
+    if (cover) {
+      doc.addImage(cover, 'JPEG', L, y0, W, 48)
+      y0 += 48
+    }
+
+    /* Encabezado de sección */
+    const sectionHeader = (title: string, top: number) => {
+      doc.setFillColor(...GREEN)
+      doc.rect(L, top, W, 8, 'F')
+      doc.setFont('times', 'bold')
+      doc.setFontSize(12)
+      doc.setTextColor(255, 255, 255)
+      doc.text(title, L + 4, top + 5.6)
+    }
+
+    /* Información del lugar */
+    y0 += 8
+    sectionHeader('Información del lugar', y0)
+
+    autoTable(doc, {
+      startY: y0 + 8,
+      margin: { left: L, right: L },
+      theme: 'grid',
+      body: [
+        ['Destino:', destination?.name || '—'],
+        ['Categoría:', place?.categoryName || report.place.category || '—'],
+        ['Estado:', place?.active ? 'Activo' : 'Inactivo'],
+      ],
+      styles: { font: 'times', fontSize: 10, textColor: DARK, lineColor: [210, 210, 205] },
+      columnStyles: {
+        0: { fontStyle: 'bold', fillColor: BEIGE, cellWidth: 40 },
+      },
+    })
+
+    y0 = (doc as any).lastAutoTable.finalY + 8
+
+    /* Rendimiento */
+    sectionHeader('Rendimiento del lugar', y0)
+    y0 += 8
+
+    const metric = (
+      x: number, top: number, w: number, h: number,
+      label: string, value: string, fill: [number, number, number], sub?: string,
+    ) => {
+      doc.setFillColor(...fill)
+      doc.rect(x, top, w, h, 'F')
+
+      doc.setFont('times', 'normal')
+      doc.setFontSize(9)
+      doc.setTextColor(...DARK)
+      doc.text(doc.splitTextToSize(label, w - 8), x + w / 2, top + 7, { align: 'center' })
+
+      doc.setFont('times', 'bold')
+      doc.setFontSize(20)
+      doc.setTextColor(...GREEN)
+      doc.text(value, x + w / 2, top + 24, { align: 'center' })
+
+      if (sub) {
+        doc.setFont('times', 'normal')
+        doc.setFontSize(9)
+        doc.setTextColor(...DARK)
+        doc.text(sub, x + w / 2, top + 30, { align: 'center' })
+      }
+    }
+
+    const cw = W / 3
+    const ch = 33
+
+    // Fila 1
+    metric(L, y0, cw, ch, 'Visitas totales al lugar', fmt(totalVisits), SOFT)
+    metric(L + cw, y0, cw, ch, 'Visitas este mes', fmt(thisMonthVisits), SOFT)
+    metric(L + cw * 2, y0, cw, ch, 'Posición entre los lugares más consultados', position, SOFT)
+
+    // Fila 2 (2 tarjetas)
+    y0 += ch + 1
+    const hw = W / 2
+    metric(
+      L, y0, hw, ch,
+      'Mes con más consultas',
+      bestKey ? monthName(bestKey) : '—',
+      BEIGE,
+      bestKey ? `${fmt(bestVisits)} visitas` : undefined,
+    )
+    metric(
+      L + hw, y0, hw, ch,
+      'Variación frente al mes anterior',
+      variation === null ? '—' : `${variation > 0 ? '+' : ''}${variation} %`,
+      BEIGE,
+    )
+
+    /* Fecha de generación */
+    y0 += ch + 8
+    doc.setDrawColor(210, 210, 205)
+    doc.setLineWidth(0.3)
+    doc.setFillColor(...BEIGE)
+    doc.rect(L, y0, 70, 9, 'FD')
+    doc.rect(L + 70, y0, W - 70, 9)
+
+    doc.setFont('times', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(...DARK)
+    doc.text('Fecha de generación del reporte:', L + 4, y0 + 6)
+
+    doc.setFont('times', 'normal')
+    doc.text(
+      new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(today),
+      L + 70 + (W - 70) / 2, y0 + 6, { align: 'center' },
+    )
+
+    doc.save(`reporte-${slugify(row.name)}-${month.value}.pdf`)
+  } catch {
+    error.value = 'No se pudo generar el PDF.'
+  } finally {
+    pdfBusy.value = null
+  }
+}
+
+const downloadSitePdf = async () => {
+  pdfBusy.value = 'all'
+  error.value = ''
+
+  try {
+    const { jsPDF, autoTable } = await loadPdfLibs()
+    const doc = new jsPDF()
+
+    doc.setFontSize(18)
+    doc.text('Reporte mensual del sitio', 14, 20)
+    doc.setFontSize(10)
+    doc.text(`Periodo: ${monthLabel.value}`, 14, 28)
+    doc.text(
+      ` Con convenio: ${agreementCount.value} | Vistas: ${totalViews.value}`,
+      14, 34,
+    )
+
+    autoTable(doc, {
+      startY: 42,
+      head: [['#', 'Lugar', 'Categoría', 'Vistas']],
+      body: statsData.value.ranking.map((r, i) => [
+        i + 1, r.name, r.category, r.views,
+      ]),
+    })
+
+    doc.save(`reporte-sitio-${month.value}.pdf`)
+  } catch {
+    error.value = 'No se pudo generar el PDF.'
+  } finally {
+    pdfBusy.value = null
+  }
+}
 </script>
 
 <template>
@@ -950,6 +1442,11 @@ const uploadImage = async (
             }}
           </span>
         </button>
+
+        <button :class="{ active: activeSection === 'dashboard' }" @click="setSection('dashboard')">
+          <i class="fa-solid fa-chart-column"></i>
+          Dashboard
+        </button>
       </nav>
 
       <div class="admin-sidebar__footer">
@@ -985,12 +1482,15 @@ const uploadImage = async (
                 : activeSection ===
                   'destinations'
                   ? 'Destinos'
+                : activeSection ===
+                 'dashboard'
+                  ? 'Dashboard'
                   : 'Categorías'
             }}
           </h1>
         </div>
 
-        <button class="btn" @click="openCreate">
+        <button v-if="activeSection !== 'dashboard'" class="btn" @click="openCreate">
           <i class="fa-solid fa-plus"></i>
 
           {{
@@ -1006,64 +1506,36 @@ const uploadImage = async (
       </header>
 
       <!-- ESTADÍSTICAS -->
-      <div class="admin-stats-scroll">
-        <div class="admin-stats">
-          <article>
-            <i class="fa-solid fa-location-dot"></i>
+        <div v-if="activeSection !== 'dashboard'" class="admin-stats-scroll">
+          <div class="admin-stats">
+            <article>
+              <i class="fa-solid fa-location-dot"></i>
+              <div>
+                <strong>{{ stats.destinations }}</strong>
+                <span>Destinos</span>
+              </div>
+            </article>
 
-            <div>
-              <strong>
-                {{
-                  stats.destinations
-                }}
-              </strong>
+            <article>
+              <i class="fa-solid fa-map-location-dot"></i>
+              <div>
+                <strong>{{ stats.places }}</strong>
+                <span>Lugares</span>
+              </div>
+            </article>
 
-              <span>
-                Destinos
-              </span>
-            </div>
-          </article>
-
-          <article>
-            <i class="fa-solid fa-map-location-dot"></i>
-
-            <div>
-              <strong>
-                {{
-                  stats.places
-                }}
-              </strong>
-
-              <span>
-                Lugares
-              </span>
-            </div>
-          </article>
-
-          <article v-for="category in categoryStats" :key="category.id">
-            <i :class="category.icon ||
-              'fa-solid fa-tag'
-              "></i>
-
-            <div>
-              <strong>
-                {{
-                  category.count
-                }}
-              </strong>
-
-              <span>
-                {{
-                  category.name
-                }}
-              </span>
-            </div>
-          </article>
+            <article v-for="category in categoryStats" :key="category.id">
+              <i :class="category.icon || 'fa-solid fa-tag'"></i>
+              <div>
+                <strong>{{ category.count }}</strong>
+                <span>{{ category.name }}</span>
+              </div>
+            </article>
+          </div>
         </div>
-      </div>
 
       <!-- CARD -->
-      <section class="admin-card">
+      <section v-if="activeSection !== 'dashboard'" class="admin-card">
         <div class="admin-toolbar">
           <div class="admin-search">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -1469,7 +1941,346 @@ const uploadImage = async (
           </div>
         </div>
       </section>
-    </section>
+      <!-- DASHBOARD -->
+      <section v-if="activeSection === 'dashboard'" class="dash">
+        <!-- Toolbar -->
+        <div class="dash-toolbar">
+          <div class="admin-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input v-model="dashSearch" type="text" placeholder="Buscar lugar...">
+          </div>
+
+          <div class="dash-toolbar__right">
+            <label class="dash-month">
+              <span>
+                Mes del reporte
+              </span>
+
+              <input v-model="month" type="month">
+            </label>
+
+            <button class="btn" :disabled="pdfBusy !== null || statsLoading" @click="downloadSitePdf">
+              <i class="fa-solid fa-file-pdf"></i>
+
+              {{
+                pdfBusy === 'all'
+                  ? 'GENERANDO...'
+                  : 'REPORTE DEL SITIO'
+              }}
+            </button>
+          </div>
+        </div>
+
+        <p v-if="error" class="admin-login__error">
+          {{
+            error
+          }}
+        </p>
+
+        <!-- Tarjetas -->
+        <div class="dash-cards">
+          <article class="dash-card dash-card--blue">
+            <i class="fa-solid fa-location-dot"></i>
+
+            <div>
+              <span>
+                Total lugares
+              </span>
+
+              <strong>
+                {{
+                  totalPlaces
+                }}
+              </strong>
+            </div>
+          </article>
+
+          <article class="dash-card dash-card--green">
+            <i class="fa-solid fa-handshake"></i>
+
+            <div>
+              <span>
+                Con convenio
+              </span>
+
+              <strong>
+                {{
+                  agreementCount
+                }}
+              </strong>
+            </div>
+          </article>
+
+          <article class="dash-card dash-card--violet">
+            <i class="fa-solid fa-eye"></i>
+
+            <div>
+              <span>
+                Vistas en
+                {{
+                  monthLabel
+                }}
+              </span>
+
+              <strong>
+                {{
+                  totalViews
+                }}
+              </strong>
+            </div>
+          </article>
+        </div>
+
+        <div class="dash-grid">
+          <!-- Columna izquierda -->
+          <div class="dash-main">
+            <!-- Gráfica -->
+            <div class="dash-panel">
+              <div class="dash-panel__head">
+                <h2>
+                  <i class="fa-solid fa-chart-column"></i>
+                  Vistas por día
+                </h2>
+
+                <span>
+                  {{
+                    monthLabel
+                  }}
+                </span>
+              </div>
+
+              <svg class="dash-chart" viewBox="0 0 600 175" preserveAspectRatio="none" role="img"
+                aria-label="Vistas por día">
+                <line x1="0" y1="160" x2="600" y2="160" class="dash-chart__axis" />
+
+                <rect v-for="(d, i) in dailySeries" :key="d.day" :x="chartBar(d.views, i).x"
+                  :y="chartBar(d.views, i).y" :width="chartBar(d.views, i).width"
+                  :height="chartBar(d.views, i).height" rx="2" class="dash-chart__bar">
+                  <title>
+                    Día {{ d.day }}: {{ d.views }} vistas
+                  </title>
+                </rect>
+              </svg>
+
+              <div class="dash-chart__foot">
+                <span>
+                  1
+                </span>
+
+                <span>
+                  Máximo diario:
+                  {{
+                    dailyMax
+                  }}
+                </span>
+
+                <span>
+                  {{
+                    range.days
+                  }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Listado -->
+            <div class="dash-panel">
+              <div class="dash-panel__head">
+                <h2>
+                  Listado de lugares
+                </h2>
+
+                <span>
+                  Mostrando
+                  {{
+                    pagedRows.length
+                  }}
+                  de
+                  {{
+                    dashboardRows.length
+                  }}
+                  lugares
+                </span>
+              </div>
+
+              <div class="dash-table-wrap">
+                <table class="dash-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        <button type="button" @click="toggleDashSort('name')">
+                          Lugar
+                          <i class="fa-solid fa-sort"></i>
+                        </button>
+                      </th>
+
+                      <th>
+                        <button type="button" @click="toggleDashSort('category')">
+                          Categoría
+                          <i class="fa-solid fa-sort"></i>
+                        </button>
+                      </th>
+
+                      <th>
+                        <button type="button" @click="toggleDashSort('views')">
+                          Búsquedas
+                          <i class="fa-solid fa-sort"></i>
+                        </button>
+                      </th>
+
+                      <th>
+                        Acciones
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr v-for="row in pagedRows" :key="row.id">
+                      <td>
+                        <div class="admin-record">
+                          <img :src="row.image" :alt="row.name">
+
+                          <div>
+                            <strong>
+                              {{
+                                row.name
+                              }}
+                            </strong>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td>
+                        <span class="admin-category">
+                          {{
+                            row.category
+                          }}
+                        </span>
+                      </td>
+
+                      <td>
+                        {{
+                          row.views.toLocaleString('es-CO')
+                        }}
+                        búsquedas
+                      </td>
+
+                      <td>
+                        <button type="button" class="dash-pdf" :disabled="pdfBusy !== null" @click="
+                          downloadPlacePdf(
+                            row,
+                          )
+                          ">
+                          <i :class="pdfBusy === row.id
+                            ? 'fa-solid fa-spinner fa-spin'
+                            : 'fa-solid fa-download'"></i>
+
+                          Descargar PDF
+                        </button>
+                      </td>
+                    </tr>
+
+                    <tr v-if="!pagedRows.length">
+                      <td colspan="4" class="dash-empty">
+                        No encontramos resultados.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="dash-pager">
+                <label class="dash-pager__size">
+                  Mostrar
+
+                  <select v-model.number="dashPageSize">
+                    <option :value="5">
+                      5
+                    </option>
+
+                    <option :value="10">
+                      10
+                    </option>
+
+                    <option :value="20">
+                      20
+                    </option>
+                  </select>
+
+                  por página
+                </label>
+
+                <div class="dash-pager__pages">
+                  <button type="button" :disabled="dashPage === 1" @click="dashPage--">
+                    Anterior
+                  </button>
+
+                  <template v-for="(p, i) in pageButtons" :key="i">
+                    <span v-if="p === '…'" class="dash-pager__dots">
+                      …
+                    </span>
+
+                    <button v-else type="button" :class="{ active: p === dashPage }" @click="dashPage = p">
+                      {{
+                        p
+                      }}
+                    </button>
+                  </template>
+
+                  <button type="button" :disabled="dashPage === dashTotalPages" @click="dashPage++">
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna derecha -->
+          <aside class="dash-panel dash-top">
+            <div class="dash-panel__head">
+              <h2>
+                <i class="fa-solid fa-chart-simple"></i>
+                Lugares más buscados
+              </h2>
+            </div>
+
+            <ol v-if="topPlaces.length">
+              <li v-for="(p, i) in topPlaces" :key="p.id">
+                <span class="dash-top__rank">
+                  {{
+                    i + 1
+                  }}
+                </span>
+
+                <div class="dash-top__body">
+                  <div class="dash-top__row">
+                    <strong>
+                      {{
+                        p.name
+                      }}
+                    </strong>
+
+                    <span>
+                      {{
+                        p.views.toLocaleString('es-CO')
+                      }}
+                    </span>
+                  </div>
+
+                  <div class="dash-top__bar">
+                    <span :style="{ width: `${(p.views / topMax) * 100}%` }"></span>
+                  </div>
+                </div>
+              </li>
+            </ol>
+
+            <p v-else class="dash-empty">
+              Aún no hay vistas en este mes.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </section>    
 
     <!-- MODAL CREAR / EDITAR -->
     <div v-if="modalOpen" class="admin-modal" @click.self="
