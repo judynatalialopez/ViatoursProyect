@@ -42,7 +42,7 @@ if (!place.length) return res.sendStatus(204);
     const [dup] = await pool.query(
       `SELECT 1 FROM place_views
        WHERE place_id = ? AND visitor_id = ? AND event_type = ?
-         AND created_at > NOW() - INTERVAL 30 MINUTE
+         AND created_at > NOW() - INTERVAL 10 SECOND
        LIMIT 1`,
       [placeId, visitorId, eventType]
     );
