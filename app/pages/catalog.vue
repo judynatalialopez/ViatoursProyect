@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 
 import { useApi } from '~/composables/useAdminData'
+const { track } = useTracking()
 import type { CatalogPlace, Category, Destination } from '~/composables/useAdminData'
 
 import 'swiper/css'
@@ -202,7 +203,7 @@ const regularPlaces = computed(() =>
                 }
               }">
             <SwiperSlide v-for="place in agreementPlaces" :key="place.id" class="agreement-item">
-              <a :href="place.url" class="item">
+              <a :href="place.url" class="item"  v-track-view="place.id"  @click="track(place.id, 'click')">
                 <div class="card-inner">
 
                   <div class="img card-face card-front">

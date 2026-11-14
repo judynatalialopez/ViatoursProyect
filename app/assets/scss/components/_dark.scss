@@ -60,7 +60,7 @@
       }
 
       .separator {
-        background: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.18)
       }
 
       p {
@@ -493,7 +493,6 @@
     }
   }
 
-  /* Dark mode only for the administration area */
   .admin-shell {
     background: #11161d;
     color: $white;
@@ -517,7 +516,14 @@
     .admin-stats article,
     .admin-card,
     .admin-modal__dialog,
-    .admin-confirm {
+    .admin-confirm,
+    .dash-card {
+      background: #1a2028;
+      border-color: rgba(255, 255, 255, .08);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
+    }
+
+    .dash-panel {
       background: #1a2028;
       border-color: rgba(255, 255, 255, .08);
       box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
@@ -564,6 +570,11 @@
       background: rgba(255, 255, 255, .025);
     }
 
+    .dash-table {
+      background: rgba(255, 255, 255, .035);
+      color: rgba(255, 255, 255, .48);
+    }
+
     .admin-actions button,
     .admin-gallery__row>button,
     .admin-modal__header>button {
@@ -593,6 +604,16 @@
     .admin-category {
       color: #dfb979;
     }
+  }
+
+  .dash-panel__head>span,
+  .admin-table th,
+  .dash-table th {
+    color: white;
+  }
+
+  line.dash-chart__axis {
+    stroke: rgb(255 255 255 / 15%);
   }
 
   @media (max-width: 760px) {

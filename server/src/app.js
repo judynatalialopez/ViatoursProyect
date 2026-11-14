@@ -16,6 +16,7 @@ app.use('/api/auth',require('./routes/auth.routes'))
 app.use('/api/destinations',require('./routes/destinations.routes'))
 app.use('/api/categories',require('./routes/categories.routes'))
 app.use('/api/places',require('./routes/places.routes'))
+app.use('/api/analytics', require('./routes/analytics'))   // <-- movida aquí
 app.use('/api', require('./routes/events'))
 app.use((req,res)=>res.status(404).json({message:'Ruta no encontrada'}))
 app.use(errorHandler)
