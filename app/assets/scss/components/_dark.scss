@@ -60,7 +60,7 @@
       }
 
       .separator {
-        background: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.18)
       }
 
       p {
@@ -517,11 +517,17 @@
     .admin-stats article,
     .admin-card,
     .admin-modal__dialog,
-    .admin-confirm {
+    .admin-confirm,
+    .dash-card{
       background: #1a2028;
       border-color: rgba(255, 255, 255, .08);
       box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
     }
+     .dash-panel{
+      background: #1a2028;
+      border-color: rgba(255, 255, 255, .08);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
+     }
 
     .admin-stats span,
     .admin-record span,
@@ -562,6 +568,11 @@
 
     .admin-table tbody tr:hover {
       background: rgba(255, 255, 255, .025);
+    }
+
+    .dash-table{
+       background: rgba(255, 255, 255, .035);
+      color: rgba(255, 255, 255, .48);
     }
 
     .admin-actions button,
