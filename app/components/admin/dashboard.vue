@@ -52,13 +52,7 @@ const now = new Date()
 
 const month = ref(`${now.getFullYear()}-${pad(now.getMonth() + 1)}`)
 
-const parts = month.value.split('-')
 
-if (parts.length < 2) {
-
-  throw new Error('Mes inválido')
-
-}
 
 const range = computed(() => {
 
@@ -105,6 +99,7 @@ const error = ref('')
 const statsData = ref<StatsResponse>({ ranking: [], daily: [], devices: [] })
 
 const statsLoading = ref(false)
+
 
 const loadStats = async () => {
 

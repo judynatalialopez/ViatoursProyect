@@ -1,5 +1,6 @@
 // server/src/controllers/analyticsController.js
 const pool = require('../config/db'); // ajusta a tu archivo real de conexión
+const IS_AGREEMENT = `LOWER(TRIM(c.name)) = 'convenio'`;
 
 const EVENTS = ['view', 'click', 'favorite'];
 const DEVICES = ['mobile', 'desktop', 'tablet'];
@@ -31,11 +32,12 @@ exports.trackEvent = async (req, res) => {
     }
 
     const [place] = await pool.query(
-      'SELECT id FROM places WHERE id = ? AND active = 1',
-      [placeId]
-    );
-    if (!place.length) return res.sendStatus(404);
-
+  `SELECT p.id FROM places p
+   JOIN categories c ON c.id = p.category_id
+   WHERE p.id = ? AND p.active = 1 AND ${IS_AGREEMENT}`,
+  [placeId]
+);
+if (!place.length) return res.sendStatus(204);
     // Anti-inflado: mismo visitante, lugar y evento en los últimos 30 min
     const [dup] = await pool.query(
       `SELECT 1 FROM place_views
@@ -66,36 +68,42 @@ exports.getStats = async (req, res) => {
     const { from, to } = getRange(req.query);
 
     const [ranking] = await pool.query(
-      `SELECT p.id, p.name, c.name AS category,
-              COALESCE(SUM(v.event_type = 'view'), 0)  AS views,
-              COALESCE(SUM(v.event_type = 'click'), 0) AS clicks,
-              COUNT(DISTINCT CASE WHEN v.event_type = 'view' THEN v.visitor_id END) AS uniques
-       FROM places p
-       JOIN categories c ON c.id = p.category_id
-       LEFT JOIN place_views v ON v.place_id = p.id
-            AND v.created_at >= ? AND v.created_at < ? + INTERVAL 1 DAY
-       GROUP BY p.id, p.name, c.name
-       ORDER BY views DESC`,
-      [from, to]
-    );
+  `SELECT p.id, p.name, c.name AS category,
+          COALESCE(SUM(v.event_type = 'view'), 0)  AS views,
+          COALESCE(SUM(v.event_type = 'click'), 0) AS clicks,
+          COUNT(DISTINCT CASE WHEN v.event_type = 'view' THEN v.visitor_id END) AS uniques
+   FROM places p
+   JOIN categories c ON c.id = p.category_id
+   LEFT JOIN place_views v ON v.place_id = p.id
+        AND v.created_at >= ? AND v.created_at < ? + INTERVAL 1 DAY
+   WHERE ${IS_AGREEMENT}
+   GROUP BY p.id, p.name, c.name
+   ORDER BY views DESC`,
+  [from, to]
+);
 
-    const [daily] = await pool.query(
-      `SELECT DATE_FORMAT(created_at, '%Y-%m-%d') AS day, COUNT(*) AS views
-       FROM place_views
-       WHERE event_type = 'view'
-         AND created_at >= ? AND created_at < ? + INTERVAL 1 DAY
-       GROUP BY day
-       ORDER BY day`,
-      [from, to]
-    );
+const [daily] = await pool.query(
+  `SELECT DATE_FORMAT(v.created_at, '%Y-%m-%d') AS day, COUNT(*) AS views
+   FROM place_views v
+   JOIN places p ON p.id = v.place_id
+   JOIN categories c ON c.id = p.category_id
+   WHERE v.event_type = 'view' AND ${IS_AGREEMENT}
+     AND v.created_at >= ? AND v.created_at < ? + INTERVAL 1 DAY
+   GROUP BY day
+   ORDER BY day`,
+  [from, to]
+);
 
-    const [devices] = await pool.query(
-      `SELECT COALESCE(device, 'unknown') AS device, COUNT(*) AS total
-       FROM place_views
-       WHERE created_at >= ? AND created_at < ? + INTERVAL 1 DAY
-       GROUP BY device`,
-      [from, to]
-    );
+const [devices] = await pool.query(
+  `SELECT COALESCE(v.device, 'unknown') AS device, COUNT(*) AS total
+   FROM place_views v
+   JOIN places p ON p.id = v.place_id
+   JOIN categories c ON c.id = p.category_id
+   WHERE ${IS_AGREEMENT}
+     AND v.created_at >= ? AND v.created_at < ? + INTERVAL 1 DAY
+   GROUP BY device`,
+  [from, to]
+);
 
     res.json({
       ranking: ranking.map(r => ({
@@ -178,13 +186,25 @@ exports.getPlaceReport = async (req, res) => {
  */
 exports.getPlaceTotals = async (req, res) => {
   try {
+    const hasRange = DATE_RE.test(req.query.from) || DATE_RE.test(req.query.to);
+    const { from, to } = getRange(req.query);
+
+    const dateFilter = hasRange
+      ? 'AND v.created_at >= ? AND v.created_at < ? + INTERVAL 1 DAY'
+      : '';
+    const params = hasRange ? [from, to] : [];
+
     const [rows] = await pool.query(
-      `SELECT place_id AS placeId,
-              SUM(event_type = 'view')  AS views,
-              SUM(event_type = 'click') AS clicks,
-              COUNT(DISTINCT CASE WHEN event_type = 'view' THEN visitor_id END) AS uniques
-       FROM place_views
-       GROUP BY place_id`
+      `SELECT p.id AS placeId,
+              COALESCE(SUM(v.event_type = 'view'), 0)     AS views,
+              COALESCE(SUM(v.event_type = 'click'), 0)    AS clicks,
+              COALESCE(SUM(v.event_type = 'favorite'), 0) AS favorites,
+              COUNT(DISTINCT CASE WHEN v.event_type = 'view' THEN v.visitor_id END) AS uniques
+       FROM places p
+          JOIN categories c ON c.id = p.category_id
+          LEFT JOIN place_views v ON v.place_id = p.id ${dateFilter}
+          WHERE ${IS_AGREEMENT}
+          GROUP BY p.id`
     );
 
     res.json(
@@ -192,6 +212,7 @@ exports.getPlaceTotals = async (req, res) => {
         placeId: r.placeId,
         views: Number(r.views),
         clicks: Number(r.clicks),
+        favorites: Number(r.favorites),
         uniques: Number(r.uniques),
       }))
     );
