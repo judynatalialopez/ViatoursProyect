@@ -493,7 +493,6 @@
     }
   }
 
-  /* Dark mode only for the administration area */
   .admin-shell {
     background: #11161d;
     color: $white;
@@ -518,16 +517,17 @@
     .admin-card,
     .admin-modal__dialog,
     .admin-confirm,
-    .dash-card{
+    .dash-card {
       background: #1a2028;
       border-color: rgba(255, 255, 255, .08);
       box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
     }
-     .dash-panel{
+
+    .dash-panel {
       background: #1a2028;
       border-color: rgba(255, 255, 255, .08);
       box-shadow: 0 8px 28px rgba(0, 0, 0, .2);
-     }
+    }
 
     .admin-stats span,
     .admin-record span,
@@ -570,8 +570,8 @@
       background: rgba(255, 255, 255, .025);
     }
 
-    .dash-table{
-       background: rgba(255, 255, 255, .035);
+    .dash-table {
+      background: rgba(255, 255, 255, .035);
       color: rgba(255, 255, 255, .48);
     }
 
@@ -604,6 +604,16 @@
     .admin-category {
       color: #dfb979;
     }
+  }
+
+  .dash-panel__head>span,
+  .admin-table th,
+  .dash-table th {
+    color: white;
+  }
+
+  line.dash-chart__axis {
+    stroke: rgb(255 255 255 / 15%);
   }
 
   @media (max-width: 760px) {
