@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch} from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 
 import { useAdminData } from '~/composables/useAdminData'
 
@@ -11,6 +11,9 @@ import type {
 } from '~/composables/useAdminData'
 
 import { adminIconOptions } from '~/data/adminIcons'
+
+import { generatePlaceReport } from '~/utils/pdf/place-report'
+import { generateSiteReport } from '~/utils/pdf/site-report'
 
 const {
   destinations,
@@ -1066,262 +1069,22 @@ const chartBar = (views: number, index: number) => {
 /* PDF */
 const pdfBusy = ref<number | 'all' | null>(null)
 
-const loadPdfLibs = async () => {
-  const { jsPDF } = await import('jspdf')
-  const mod: any = await import('jspdf-autotable')
-  return { jsPDF, autoTable: mod.default ?? mod.autoTable }
-}
-
-const slugify = (text: string) =>
-  text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-
-const LOGO_URL = '/img/logo-agl.png' // 👈 ajusta a la ruta real de tu logo
-
-/* Descarga una imagen y la recorta tipo object-fit: cover */
-const loadCoverImage = (url: string, w: number, h: number) =>
-  new Promise<string | null>((resolve) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const scale = 4
-      const canvas = document.createElement('canvas')
-      canvas.width = w * scale
-      canvas.height = h * scale
-      const ctx = canvas.getContext('2d')!
-      const ratio = Math.max(canvas.width / img.width, canvas.height / img.height)
-      const dw = img.width * ratio
-      const dh = img.height * ratio
-      ctx.drawImage(img, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh)
-      resolve(canvas.toDataURL('image/jpeg', 0.9))
-    }
-    img.onerror = () => resolve(null)
-    img.src = url
-  })
-
-const loadLogo = (url: string) =>
-  new Promise<{ data: string; ratio: number } | null>((resolve) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      canvas.width = img.width
-      canvas.height = img.height
-      canvas.getContext('2d')!.drawImage(img, 0, 0)
-      resolve({ data: canvas.toDataURL('image/png'), ratio: img.width / img.height })
-    }
-    img.onerror = () => resolve(null)
-    img.src = url
-  })
-
-const capitalize = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
-
-const monthName = (key: string) => {
-  const [y, m] = key.split('-').map(Number) as [number, number]
-  return capitalize(
-    new Intl.DateTimeFormat('es-CO', { month: 'long' }).format(new Date(y, m - 1, 1)),
-  )
-}
-
 const downloadPlacePdf = async (row: { id: number; name: string }) => {
   pdfBusy.value = row.id
   error.value = ''
 
   try {
-    const place = places.value.find(p => p.id === row.id)
-    const destination = destinations.value.find(d => d.id === place?.destinationId)
-
-    const today = new Date()
-    const todayISO = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`
-
-    // Histórico completo para calcular todas las métricas
-    const report = await request<PlaceReport>(
-      `/analytics/place/${row.id}?from=2000-01-01&to=${todayISO}`,
-    )
-
-    /* ---- Métricas ---- */
-    const byMonth = new Map<string, number>()
-    for (const d of report.daily) {
-      const key = d.day.slice(0, 7)
-      byMonth.set(key, (byMonth.get(key) || 0) + d.views)
-    }
-
-    const totalVisits = report.totals.views
-    const thisMonthVisits = byMonth.get(month.value) || 0
-
-    const [y, m] = month.value.split('-').map(Number) as [number, number]
-    const prev = new Date(y, m - 2, 1)
-    const prevKey = `${prev.getFullYear()}-${pad(prev.getMonth() + 1)}`
-    const prevVisits = byMonth.get(prevKey) || 0
-
-    const variation = prevVisits > 0
-      ? Math.round(((thisMonthVisits - prevVisits) / prevVisits) * 100)
-      : null
-
-    let bestKey = ''
-    let bestVisits = 0
-    byMonth.forEach((v, k) => {
-      if (v > bestVisits) { bestVisits = v; bestKey = k }
+    await generatePlaceReport({
+      row,
+      places: places.value,
+      destinations: destinations.value,
+      ranking: statsData.value.ranking,
+      month: month.value,
+      request,
     })
-
-    const ranked = [...statsData.value.ranking].sort((a, b) => b.views - a.views)
-    const rankIndex = ranked.findIndex(r => r.id === row.id)
-    const position = rankIndex >= 0 && ranked[rankIndex]!.views > 0
-      ? `#${rankIndex + 1}`
-      : '—'
-
-    const fmt = (n: number) => n.toLocaleString('es-CO')
-
-    /* ---- Recursos ---- */
-    const [{ jsPDF, autoTable }, logo, cover] = await Promise.all([
-      loadPdfLibs(),
-      loadLogo(LOGO_URL),
-      place?.image ? loadCoverImage(place.image, 182, 48) : Promise.resolve(null),
-    ])
-
-    const doc = new jsPDF()
-    const L = 14
-    const W = 182
-    const GREEN: [number, number, number] = [47, 93, 58]
-    const SOFT: [number, number, number] = [232, 238, 231]
-    const BEIGE: [number, number, number] = [243, 239, 231]
-    const DARK: [number, number, number] = [18, 22, 28]
-
-    let y0 = 12
-
-    /* Logo */
-    if (logo) {
-      const h = 22
-      const w = h * logo.ratio
-      doc.addImage(logo.data, 'PNG', (210 - w) / 2, y0, w, h)
-    }
-    y0 += 28
-
-    doc.setDrawColor(...GREEN)
-    doc.setLineWidth(0.6)
-    doc.line(L, y0, L + W, y0)
-
-    /* Título */
-    y0 += 14
-    doc.setFont('times', 'bold')
-    doc.setFontSize(24)
-    doc.setTextColor(...DARK)
-    doc.text(row.name, 105, y0, { align: 'center' })
-
-    /* Imagen */
-    y0 += 8
-    if (cover) {
-      doc.addImage(cover, 'JPEG', L, y0, W, 48)
-      y0 += 48
-    }
-
-    /* Encabezado de sección */
-    const sectionHeader = (title: string, top: number) => {
-      doc.setFillColor(...GREEN)
-      doc.rect(L, top, W, 8, 'F')
-      doc.setFont('times', 'bold')
-      doc.setFontSize(12)
-      doc.setTextColor(255, 255, 255)
-      doc.text(title, L + 4, top + 5.6)
-    }
-
-    /* Información del lugar */
-    y0 += 8
-    sectionHeader('Información del lugar', y0)
-
-    autoTable(doc, {
-      startY: y0 + 8,
-      margin: { left: L, right: L },
-      theme: 'grid',
-      body: [
-        ['Destino:', destination?.name || '—'],
-        ['Categoría:', place?.categoryName || report.place.category || '—'],
-        ['Estado:', place?.active ? 'Activo' : 'Inactivo'],
-      ],
-      styles: { font: 'times', fontSize: 10, textColor: DARK, lineColor: [210, 210, 205] },
-      columnStyles: {
-        0: { fontStyle: 'bold', fillColor: BEIGE, cellWidth: 40 },
-      },
-    })
-
-    y0 = (doc as any).lastAutoTable.finalY + 8
-
-    /* Rendimiento */
-    sectionHeader('Rendimiento del lugar', y0)
-    y0 += 8
-
-    const metric = (
-      x: number, top: number, w: number, h: number,
-      label: string, value: string, fill: [number, number, number], sub?: string,
-    ) => {
-      doc.setFillColor(...fill)
-      doc.rect(x, top, w, h, 'F')
-
-      doc.setFont('times', 'normal')
-      doc.setFontSize(9)
-      doc.setTextColor(...DARK)
-      doc.text(doc.splitTextToSize(label, w - 8), x + w / 2, top + 7, { align: 'center' })
-
-      doc.setFont('times', 'bold')
-      doc.setFontSize(20)
-      doc.setTextColor(...GREEN)
-      doc.text(value, x + w / 2, top + 24, { align: 'center' })
-
-      if (sub) {
-        doc.setFont('times', 'normal')
-        doc.setFontSize(9)
-        doc.setTextColor(...DARK)
-        doc.text(sub, x + w / 2, top + 30, { align: 'center' })
-      }
-    }
-
-    const cw = W / 3
-    const ch = 33
-
-    // Fila 1
-    metric(L, y0, cw, ch, 'Visitas totales al lugar', fmt(totalVisits), SOFT)
-    metric(L + cw, y0, cw, ch, 'Visitas este mes', fmt(thisMonthVisits), SOFT)
-    metric(L + cw * 2, y0, cw, ch, 'Posición entre los lugares más consultados', position, SOFT)
-
-    // Fila 2 (2 tarjetas)
-    y0 += ch + 1
-    const hw = W / 2
-    metric(
-      L, y0, hw, ch,
-      'Mes con más consultas',
-      bestKey ? monthName(bestKey) : '—',
-      BEIGE,
-      bestKey ? `${fmt(bestVisits)} visitas` : undefined,
-    )
-    metric(
-      L + hw, y0, hw, ch,
-      'Variación frente al mes anterior',
-      variation === null ? '—' : `${variation > 0 ? '+' : ''}${variation} %`,
-      BEIGE,
-    )
-
-    /* Fecha de generación */
-    y0 += ch + 8
-    doc.setDrawColor(210, 210, 205)
-    doc.setLineWidth(0.3)
-    doc.setFillColor(...BEIGE)
-    doc.rect(L, y0, 70, 9, 'FD')
-    doc.rect(L + 70, y0, W - 70, 9)
-
-    doc.setFont('times', 'bold')
-    doc.setFontSize(10)
-    doc.setTextColor(...DARK)
-    doc.text('Fecha de generación del reporte:', L + 4, y0 + 6)
-
-    doc.setFont('times', 'normal')
-    doc.text(
-      new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(today),
-      L + 70 + (W - 70) / 2, y0 + 6, { align: 'center' },
-    )
-
-    doc.save(`reporte-${slugify(row.name)}-${month.value}.pdf`)
-  } catch {
-    error.value = 'No se pudo generar el PDF.'
+  } catch (e) {
+    console.error(e)
+    error.value = 'Could not generate the place report.'
   } finally {
     pdfBusy.value = null
   }
@@ -1332,33 +1095,22 @@ const downloadSitePdf = async () => {
   error.value = ''
 
   try {
-    const { jsPDF, autoTable } = await loadPdfLibs()
-    const doc = new jsPDF()
-
-    doc.setFontSize(18)
-    doc.text('Reporte mensual del sitio', 14, 20)
-    doc.setFontSize(10)
-    doc.text(`Periodo: ${monthLabel.value}`, 14, 28)
-    doc.text(
-      ` Con convenio: ${agreementCount.value} | Vistas: ${totalViews.value}`,
-      14, 34,
-    )
-
-    autoTable(doc, {
-      startY: 42,
-      head: [['#', 'Lugar', 'Categoría', 'Vistas']],
-      body: statsData.value.ranking.map((r, i) => [
-        i + 1, r.name, r.category, r.views,
-      ]),
+    await generateSiteReport({
+      month: month.value,
+      monthLabel: monthLabel.value,
+      agreementCount: agreementCount.value,
+      totalPlaces: totalPlaces.value,
+      totalViews: totalViews.value,
+      ranking: statsData.value.ranking,
     })
-
-    doc.save(`reporte-sitio-${month.value}.pdf`)
-  } catch {
-    error.value = 'No se pudo generar el PDF.'
+  } catch (e) {
+    console.error(e)
+    error.value = 'Could not generate the site report.'
   } finally {
     pdfBusy.value = null
   }
 }
+
 </script>
 
 <template>
@@ -1482,10 +1234,10 @@ const downloadSitePdf = async () => {
                 : activeSection ===
                   'destinations'
                   ? 'Destinos'
-                : activeSection ===
-                 'dashboard'
-                  ? 'Dashboard'
-                  : 'Categorías'
+                  : activeSection ===
+                    'dashboard'
+                    ? 'Dashboard'
+                    : 'Categorías'
             }}
           </h1>
         </div>
@@ -1506,33 +1258,33 @@ const downloadSitePdf = async () => {
       </header>
 
       <!-- ESTADÍSTICAS -->
-        <div v-if="activeSection !== 'dashboard'" class="admin-stats-scroll">
-          <div class="admin-stats">
-            <article>
-              <i class="fa-solid fa-location-dot"></i>
-              <div>
-                <strong>{{ stats.destinations }}</strong>
-                <span>Destinos</span>
-              </div>
-            </article>
+      <div v-if="activeSection !== 'dashboard'" class="admin-stats-scroll">
+        <div class="admin-stats">
+          <article>
+            <i class="fa-solid fa-location-dot"></i>
+            <div>
+              <strong>{{ stats.destinations }}</strong>
+              <span>Destinos</span>
+            </div>
+          </article>
 
-            <article>
-              <i class="fa-solid fa-map-location-dot"></i>
-              <div>
-                <strong>{{ stats.places }}</strong>
-                <span>Lugares</span>
-              </div>
-            </article>
+          <article>
+            <i class="fa-solid fa-map-location-dot"></i>
+            <div>
+              <strong>{{ stats.places }}</strong>
+              <span>Lugares</span>
+            </div>
+          </article>
 
-            <article v-for="category in categoryStats" :key="category.id">
-              <i :class="category.icon || 'fa-solid fa-tag'"></i>
-              <div>
-                <strong>{{ category.count }}</strong>
-                <span>{{ category.name }}</span>
-              </div>
-            </article>
-          </div>
+          <article v-for="category in categoryStats" :key="category.id">
+            <i :class="category.icon || 'fa-solid fa-tag'"></i>
+            <div>
+              <strong>{{ category.count }}</strong>
+              <span>{{ category.name }}</span>
+            </div>
+          </article>
         </div>
+      </div>
 
       <!-- CARD -->
       <section v-if="activeSection !== 'dashboard'" class="admin-card">
@@ -2054,9 +1806,9 @@ const downloadSitePdf = async () => {
                 aria-label="Vistas por día">
                 <line x1="0" y1="160" x2="600" y2="160" class="dash-chart__axis" />
 
-                <rect v-for="(d, i) in dailySeries" :key="d.day" :x="chartBar(d.views, i).x"
-                  :y="chartBar(d.views, i).y" :width="chartBar(d.views, i).width"
-                  :height="chartBar(d.views, i).height" rx="2" class="dash-chart__bar">
+                <rect v-for="(d, i) in dailySeries" :key="d.day" :x="chartBar(d.views, i).x" :y="chartBar(d.views, i).y"
+                  :width="chartBar(d.views, i).width" :height="chartBar(d.views, i).height" rx="2"
+                  class="dash-chart__bar">
                   <title>
                     Día {{ d.day }}: {{ d.views }} vistas
                   </title>
@@ -2280,7 +2032,7 @@ const downloadSitePdf = async () => {
           </aside>
         </div>
       </section>
-    </section>    
+    </section>
 
     <!-- MODAL CREAR / EDITAR -->
     <div v-if="modalOpen" class="admin-modal" @click.self="
