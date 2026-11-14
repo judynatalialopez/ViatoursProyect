@@ -255,14 +255,6 @@
 
             </div>
 
-            <a href="#" class="google-qr__button">
-
-              <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" alt="">
-
-              COMPARTIR MI OPINIÓN
-
-            </a>
-
           </aside>
 
         </div>
