@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS place_branches (
+CREATE TABLE  IF NOT EXISTS place_branches (
   id             BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   place_id       BIGINT UNSIGNED NOT NULL,
   destination_id BIGINT UNSIGNED NOT NULL,
