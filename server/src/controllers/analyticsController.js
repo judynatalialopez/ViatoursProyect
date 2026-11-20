@@ -14,9 +14,7 @@ const getRange = (query) => {
   return { from, to };
 };
 
-/**
- * POST /analytics/events  (público)
- */
+
 exports.trackEvent = async (req, res) => {
   try {
     const { placeId, visitorId, eventType = 'view', device = null } = req.body;

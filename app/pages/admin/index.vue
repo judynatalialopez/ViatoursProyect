@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useAdminData } from '~/composables/useAdminData'
 import type {
   CatalogPlace,
@@ -7,6 +7,15 @@ import type {
   Destination,
 } from '~/composables/useAdminData'
 import { adminIconOptions } from '~/data/adminIcons'
+
+interface BranchRowInput {
+  _key?: string
+  id?: number | null
+  destinationId: number | null
+  address: string
+  phone: string
+}
+
 const {
   destinations,
   categories,
@@ -14,6 +23,7 @@ const {
   load,
   request,
 } = useAdminData()
+
 const activeSection = ref<
   'places' | 'destinations' | 'categories' | 'dashboard'
 >('places')
@@ -30,6 +40,7 @@ const deleteTarget = ref<{
   id: number
   name: string
 } | null>(null)
+
 /**
  * ICONOS
  */
@@ -54,10 +65,11 @@ const selectCategoryIcon = (
 ) => {
   categoryForm.icon = icon
 }
+
 /**
  * FORMULARIOS VACÍOS
  */
-const emptyPlace = (): CatalogPlace => ({
+const emptyPlace = (): CatalogPlace & { branches: BranchRowInput[] } => ({
   id: 0,
   destinationId:
     destinations.value[0]?.id || 0,
@@ -72,7 +84,10 @@ const emptyPlace = (): CatalogPlace => ({
   url: '',
   date_create: '',
   active: true,
+  gallery: [],
+  branches: [],
 })
+
 const emptyDestination = (): Destination => ({
   id: 0,
   name: '',
@@ -80,6 +95,7 @@ const emptyDestination = (): Destination => ({
   link: '/catalog',
   active: true,
 })
+
 const emptyCategory = (): Category => ({
   id: 0,
   name: '',
@@ -87,18 +103,17 @@ const emptyCategory = (): Category => ({
   icon: 'fa-solid fa-tag',
   active: true,
 })
-const placeForm =
-  reactive<CatalogPlace>(
-    emptyPlace(),
-  )
-const destinationForm =
-  reactive<Destination>(
-    emptyDestination(),
-  )
-const categoryForm =
-  reactive<Category>(
-    emptyCategory(),
-  )
+
+const placeForm = reactive<CatalogPlace & { branches: BranchRowInput[] }>(
+  emptyPlace(),
+)
+const destinationForm = reactive<Destination>(
+  emptyDestination(),
+)
+const categoryForm = reactive<Category>(
+  emptyCategory(),
+)
+
 /**
  * GALERÍA
  */
@@ -116,6 +131,134 @@ const removeGalleryImage = (
     1,
   )
 }
+
+/**
+ * SUCURSALES (OPCIÓN B)
+ */
+const mainDestinationName = computed(() => {
+  const found = destinations.value.find(
+    (d) => d.id === placeForm.destinationId,
+  )
+  return found ? found.name : 'sin definir'
+})
+
+const availableBranchDestinations = computed(() => {
+  return destinations.value.filter(
+    (d) => d.id !== placeForm.destinationId,
+  )
+})
+
+const getDestinationsForBranchRow = (currentIndex: number) => {
+  const selectedElsewhere = new Set(
+    (placeForm.branches || [])
+      .map((b, idx) => (idx !== currentIndex ? b.destinationId : null))
+      .filter(Boolean),
+  )
+  return availableBranchDestinations.value.filter(
+    (d) =>
+      !selectedElsewhere.has(d.id) ||
+      d.id === placeForm.branches?.[currentIndex]?.destinationId,
+  )
+}
+
+const addBranchRow = () => {
+  if (!Array.isArray(placeForm.branches)) {
+    placeForm.branches = []
+  }
+  const usedIds = new Set([
+    placeForm.destinationId,
+    ...placeForm.branches.map((b) => b.destinationId).filter(Boolean),
+  ])
+  const nextDest = destinations.value.find((d) => !usedIds.has(d.id))
+
+  placeForm.branches.push({
+    _key:
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random()}`,
+    id: null,
+    destinationId: nextDest ? nextDest.id : null,
+    address: '',
+    phone: '',
+  })
+}
+
+const removeBranchRow = (index: number) => {
+  placeForm.branches?.splice(index, 1)
+}
+
+// Si cambia el destino principal y coincide con alguna sucursal, evita choque con el backend
+watch(
+  () => placeForm.destinationId,
+  (newMainDestId) => {
+    if (!Array.isArray(placeForm.branches)) return
+    for (let i = placeForm.branches.length - 1; i >= 0; i--) {
+      const b = placeForm.branches[i] as BranchRowInput
+      if (b.destinationId && Number(b.destinationId) === Number(newMainDestId)) {
+        placeForm.branches.splice(i, 1)
+      }
+    }
+  },
+)
+
+const syncPlaceBranches = async (
+  placeId: number,
+  branchesInput: BranchRowInput[] = [],
+) => {
+  const cleanBranches = (branchesInput || [])
+    .filter(
+      (b) =>
+        b.destinationId &&
+        Number(b.destinationId) !== Number(placeForm.destinationId),
+    )
+    .map((b) => ({
+      id: b.id ?? null,
+      destinationId: Number(b.destinationId),
+      address: String(b.address || '').trim() || null,
+      phone: String(b.phone || '').trim() || null,
+    }))
+
+  if (editingId.value !== null) {
+    const existing = await request<
+      Array<{ id: number; isBranch: boolean }>
+    >(`/places/${placeId}/branches`)
+    const existingBranches = (existing || []).filter((b) => b.isBranch)
+    const keptIds = new Set(cleanBranches.map((b) => b.id).filter(Boolean))
+
+    for (const oldBranch of existingBranches) {
+      if (!keptIds.has(oldBranch.id)) {
+        await request(`/places/${placeId}/branches/${oldBranch.id}`, {
+          method: 'DELETE',
+        })
+      }
+    }
+
+    for (const item of cleanBranches.filter((b) => b.id)) {
+      await request(`/places/${placeId}/branches/${item.id}`, {
+        method: 'PUT',
+        body: {
+          address: item.address,
+          phone: item.phone,
+        },
+      })
+    }
+  }
+
+  const newBranches = cleanBranches.filter((b) => !b.id)
+  if (newBranches.length) {
+    await request(`/places/${placeId}/branches`, {
+      method: 'POST',
+      body: {
+        branches: newBranches.map(({ destinationId, address, phone }) => ({
+          destinationId,
+          address,
+          phone,
+        })),
+      },
+    })
+  }
+}
+
 /**
  * TEMA ADMIN
  */
@@ -131,11 +274,13 @@ const toggleAdminTheme = () => {
     )
   }
 }
+
 /**
  * CATEGORÍAS
  */
 const availableCategories =
   computed(() => categories.value)
+
 /**
  * FILTRAR LUGARES
  */
@@ -174,6 +319,7 @@ const filteredPlaces =
       },
     )
   })
+
 /**
  * AGRUPAR LUGARES POR DESTINO
  */
@@ -182,18 +328,18 @@ const groupedPlaces =
     return destinations.value
       .map((destination) => ({
         destination,
-        places:
-          filteredPlaces.value.filter(
-            (place) =>
-              place.destinationId ===
-              destination.id,
-          ),
+        places: filteredPlaces.value.filter((place) =>
+          place.branches?.length
+            ? place.branches.some((b) => b.destinationId === destination.id)
+            : place.destinationId === destination.id,
+        ),
       }))
       .filter(
         (group) =>
           group.places.length > 0,
       )
   })
+
 /**
  * FILTRAR DESTINOS
  */
@@ -223,6 +369,7 @@ const filteredDestinations =
         ),
     )
   })
+
 /**
  * FILTRAR CATEGORÍAS
  */
@@ -252,6 +399,7 @@ const filteredCategories =
         ),
     )
   })
+
 /**
  * ESTADÍSTICAS
  */
@@ -275,6 +423,7 @@ const categoryStats =
       }),
     ),
   )
+
 /**
  * FORMATEAR FECHA
  */
@@ -304,6 +453,7 @@ const formatDate = (
     },
   ).format(parsed)
 }
+
 /**
  * AUTENTICACIÓN
  */
@@ -324,6 +474,7 @@ onMounted(() => {
     ) === 'dark'
   ensureAuth()
 })
+
 /**
  * CAMBIAR SECCIÓN
  */
@@ -341,6 +492,7 @@ const setSection = (
     'all'
   error.value = ''
 }
+
 /**
  * CREAR
  */
@@ -375,6 +527,7 @@ const openCreate = () => {
   }
   modalOpen.value = true
 }
+
 /**
  * EDITAR LUGAR
  */
@@ -384,10 +537,19 @@ const openEditPlace = async (
   editingId.value = item.id
   error.value = ''
   try {
-    const detail =
-      await request<CatalogPlace>(
-        `/places/${item.id}`,
-      )
+    const [detail, branchesData] = await Promise.all([
+      request<CatalogPlace>(`/places/${item.id}`),
+      request<
+        Array<{
+          id: number
+          destinationId: number
+          isBranch: boolean
+          address?: string | null
+          phone?: string | null
+        }>
+      >(`/places/${item.id}/branches`).catch(() => []),
+    ])
+
     Object.assign(
       placeForm,
       detail,
@@ -396,6 +558,15 @@ const openEditPlace = async (
           ...(detail.gallery ||
             []),
         ],
+        branches: (branchesData || [])
+          .filter((b) => b.isBranch)
+          .map((b) => ({
+            _key: `branch-${b.id}`,
+            id: b.id,
+            destinationId: b.destinationId,
+            address: b.address || '',
+            phone: b.phone || '',
+          })),
       },
     )
   } catch {
@@ -404,11 +575,13 @@ const openEditPlace = async (
       item,
       {
         gallery: [],
+        branches: [],
       },
     )
   }
   modalOpen.value = true
 }
+
 /**
  * EDITAR DESTINO
  */
@@ -422,6 +595,7 @@ const openEditDestination = (
   )
   modalOpen.value = true
 }
+
 /**
  * EDITAR CATEGORÍA
  */
@@ -436,6 +610,7 @@ const openEditCategory = (
   )
   modalOpen.value = true
 }
+
 /**
  * GUARDAR
  */
@@ -444,7 +619,7 @@ const saveItem = async () => {
   try {
     /**
      * LUGAR
-          */
+     */
     if (
       activeSection.value ===
       'places'
@@ -477,7 +652,7 @@ const saveItem = async () => {
         active:
           placeForm.active,
       }
-      await request(
+      const saved = await request<{ id?: number }>(
         `/places${editingId.value
           ? `/${editingId.value}`
           : ''
@@ -490,10 +665,19 @@ const saveItem = async () => {
           body,
         },
       )
+      const targetPlaceId = Number(
+        editingId.value ?? saved?.id ?? placeForm.id,
+      )
+      if (targetPlaceId) {
+        await syncPlaceBranches(
+          targetPlaceId,
+          placeForm.branches || [],
+        )
+      }
     }
     /**
      * DESTINO
-          */
+     */
     else if (
       activeSection.value ===
       'destinations'
@@ -521,7 +705,7 @@ const saveItem = async () => {
     }
     /**
      * CATEGORÍA
-          */
+     */
     else {
       await request(
         `/categories${editingId.value
@@ -552,6 +736,7 @@ const saveItem = async () => {
       'No fue posible guardar los cambios.'
   }
 }
+
 /**
  * ACTIVAR / DESACTIVAR LUGAR
  */
@@ -571,6 +756,7 @@ const togglePlace = async (
   )
   await load()
 }
+
 /**
  * ACTIVAR / DESACTIVAR DESTINO
  */
@@ -594,6 +780,7 @@ const toggleDestination =
     )
     await load()
   }
+
 /**
  * ACTIVAR / DESACTIVAR CATEGORÍA
  */
@@ -617,6 +804,7 @@ const toggleCategory =
     )
     await load()
   }
+
 /**
  * ELIMINAR
  */
@@ -670,6 +858,7 @@ const confirmDelete =
         null
     }
   }
+
 /**
  * LOGOUT
  */
@@ -687,6 +876,7 @@ const logout = async () => {
     )
   }
 }
+
 /**
  * SUBIDA DE IMÁGENES
  */
@@ -733,7 +923,11 @@ const uploadImage = async (
     input.value = ''
   }
 }
+
+const isBranchIn = (item: CatalogPlace, destinationId: number) =>
+  item.branches?.find(b => b.destinationId === destinationId)?.isBranch === true
 </script>
+
 <template>
   <main class="admin-shell" :class="{
     'admin-dark':
@@ -968,6 +1162,12 @@ const uploadImage = async (
                       Creación
                     </th>
                     <th>
+                      Destino
+                    </th>
+                    <th>
+                      Sucursal
+                    </th>
+                    <th>
                       Estado
                     </th>
                     <th>
@@ -1011,6 +1211,26 @@ const uploadImage = async (
                           item.date_create,
                         )
                       }}
+                    </td>
+                    <td>
+                      <div class="admin-chips">
+                        <span
+                          v-for="b in item.branches"
+                          :key="b.id"
+                          class="admin-chip"
+                          :class="{ current: b.destinationId === group.destination.id }"
+                        >
+                          {{ b.destinationName }}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        class="admin-branch"
+                        :class="{ 'is-branch': isBranchIn(item, group.destination.id) }"
+                      >
+                        {{ isBranchIn(item, group.destination.id) ? 'Sucursal' : 'Sede principal' }}
+                      </span>
                     </td>
                     <td>
                       <button class="admin-status" :class="{
@@ -1477,6 +1697,80 @@ _,
               </div>
               <p v-else class="admin-gallery__empty">
                 Solo se mostrará la portada hasta que añadas más imágenes.
+              </p>
+            </div>
+
+            <!-- SUCURSALES (OPCIÓN B) - FUERA DEL V-FOR DE GALERÍA -->
+            <div class="admin-gallery admin-form__wide">
+              <div class="admin-gallery__header">
+                <div>
+                  <span>Sucursales en otros destinos</span>
+                  <small>
+                    Opcional. El destino principal ({{ mainDestinationName }}) no puede repetirse como sucursal.
+                  </small>
+                </div>
+                <button
+                  type="button"
+                  class="admin-btn-secondary"
+                  :disabled="!availableBranchDestinations.length"
+                  @click="addBranchRow"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                  AÑADIR SUCURSAL
+                </button>
+              </div>
+
+              <div v-if="placeForm.branches?.length" class="admin-gallery__list">
+                <div
+                  v-for="(branch, index) in placeForm.branches"
+                  :key="branch._key ?? index"
+                  class="admin-gallery__row"
+                  style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;"
+                >
+                  <span>{{ index + 1 }}</span>
+
+                  <select
+                    v-model.number="branch.destinationId"
+                    required
+                    style="flex: 1; min-width: 150px;"
+                  >
+                    <option :value="null" disabled>Selecciona destino...</option>
+                    <option
+                      v-for="dest in getDestinationsForBranchRow(index)"
+                      :key="dest.id"
+                      :value="dest.id"
+                    >
+                      {{ dest.name }}
+                    </option>
+                  </select>
+
+                  <input
+                    v-model="branch.address"
+                    type="text"
+                    placeholder="Dirección (opcional)"
+                    style="flex: 1.5; min-width: 170px;"
+                  >
+
+                  <input
+                    v-model="branch.phone"
+                    type="text"
+                    placeholder="Teléfono (opcional)"
+                    style="flex: 1; min-width: 130px;"
+                  >
+
+                  <button
+                    type="button"
+                    class="admin-gallery__action admin-gallery__action--danger"
+                    title="Quitar sucursal"
+                    @click="removeBranchRow(index)"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+
+              <p v-else class="admin-gallery__empty">
+                Este lugar solo tendrá su sede principal a menos que añadas sucursales.
               </p>
             </div>
           </template>

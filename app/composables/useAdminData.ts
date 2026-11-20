@@ -1,5 +1,14 @@
 export type Destination = { id: number, name: string, slug?: string, image: string, link: string, active: boolean }
 export type Category = { id: number, name: string, slug: string, icon: string, active: boolean, placeCount?: number }
-export type CatalogPlace = { id: number, destinationId: number, categoryId: number, destinationName?: string, name: string, category: string, categoryName: string, description: string, phone: string, address?: string, image: string, url: string, date_create: string, active: boolean, gallery?: string[] }
+export type CatalogPlace = { id: number, destinationId: number, categoryId: number, destinationName?: string, name: string, category: string, categoryName: string, description: string, phone: string, address?: string, image: string, url: string, date_create: string, active: boolean, gallery?:  string[],  branches?: PlaceBranch[]}
+export interface PlaceBranch {
+  id: number
+  destinationId: number
+  destinationName: string
+  isBranch: boolean
+  address?: string | null
+  phone?: string | null
+}
 export const useApi = () => { const config = useRuntimeConfig(); const apiBase = config.public.apiBase; const request = <T>(url: string, options: any = {}) => $fetch<T>(`${apiBase}${url}`, { credentials: 'include', ...options }); return { apiBase, request } }
 export const useAdminData = () => { const destinations = useState<Destination[]>('admin-destinations', () => []); const categories = useState<Category[]>('admin-categories', () => []); const places = useState<CatalogPlace[]>('admin-places', () => []); const { request } = useApi(); const load = async () => { const [d, c, p] = await Promise.all([request<Destination[]>('/destinations?all=1'), request<Category[]>('/categories?all=1'), request<CatalogPlace[]>('/places?all=1')]); destinations.value = d; categories.value = c; places.value = p }; return { destinations, categories, places, load, request } }
+ 
